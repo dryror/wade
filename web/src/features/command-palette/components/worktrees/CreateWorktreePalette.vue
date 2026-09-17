@@ -5,6 +5,10 @@ import PaletteShell from '@/features/command-palette/components/PaletteShell.vue
 import { usePaletteRequestState } from '@/features/command-palette/composables/usePaletteRequestState';
 import { useWorktreeNavigation } from '@/features/command-palette/composables/useWorktreeNavigation';
 import type { PaletteResult } from '@/features/command-palette/types';
+import {
+  recordCreatedWorktree,
+  useRepositoryWorktreeCache
+} from '@/features/workspaces/composables/useRepositoryWorktreeCache';
 
 const props = defineProps<{
   repositoryId: string;
@@ -15,6 +19,7 @@ const emit = defineEmits<{
 }>();
 
 const { closeReservedWorktreeTab, openWorktree: navigateToWorktree, reserveWorktreeTab } = useWorktreeNavigation();
+const worktreeCache = useRepositoryWorktreeCache();
 const createdWorktree = ref<Worktree | undefined>();
 const copyWarnings = computed(() => createdWorktree.value?.ignoredFileCopyWarnings ?? []);
 const hasCopyWarnings = computed(() => copyWarnings.value.length > 0);
@@ -59,6 +64,7 @@ const createOrOpenWorktree = async () => {
 
   try {
     const worktree = await createRepositoryWorktree(props.repositoryId, { branchRef: branchName.value });
+    recordCreatedWorktree(worktreeCache, worktree);
     if ((worktree.ignoredFileCopyWarnings?.length ?? 0) > 0) {
       closeReservedWorktreeTab(reservedTab);
       createdWorktree.value = worktree;

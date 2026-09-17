@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, type DeepReadonly } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { deleteRepositoryWorktree, listRepositoryWorktrees, type Worktree } from '@/api/generated/wade';
+import { deleteRepositoryWorktree } from '@/api/generated/wade';
 import { useFuzzyItems } from '@/composables/useFuzzyItems';
 import PaletteShell from '@/features/command-palette/components/PaletteShell.vue';
 import { usePaletteRequestState } from '@/features/command-palette/composables/usePaletteRequestState';
-import type { PaletteResult } from '@/features/command-palette/types';
+import type { PaletteNotice, PaletteResult } from '@/features/command-palette/types';
 import { useWorkspaces } from '@/features/workspaces/composables/useWorkspaces';
+import {
+  listRemovableWorktrees,
+  useRepositoryWorktreeCache,
+  type CachedWorktree
+} from '@/features/workspaces/composables/useRepositoryWorktreeCache';
 import { useWorkspaceSessionStore } from '@/stores/useWorkspaceSessionStore';
 
 const props = defineProps<{
@@ -21,28 +26,60 @@ const emit = defineEmits<{
 const router = useRouter();
 const { syncWorkspaces } = useWorkspaces();
 const workspaceSessionStore = useWorkspaceSessionStore();
-const worktrees = ref<Worktree[]>([]);
-const targetWorktree = ref<DeepReadonly<Worktree> | undefined>();
+const worktreeCache = useRepositoryWorktreeCache();
+const targetWorktreeId = ref<string | undefined>();
+const operationTargetWorktree = ref<CachedWorktree | undefined>();
 const {
-  clearErrors,
   clearActionError,
   isActing: isRemoving,
-  isLoading,
-  loadError,
-  notice,
+  notice: actionNotice,
   query,
   setActionError,
-  setLoadError,
   updateQuery
 } = usePaletteRequestState({
   errorTitle: 'Worktree removal failed'
 });
+const repositoryState = computed(() => worktreeCache.observe(props.repositoryId));
+const worktrees = computed<readonly CachedWorktree[]>(() =>
+  repositoryState.value.kind === 'cached' ? repositoryState.value.worktrees : []
+);
+const removableWorktrees = computed(() => listRemovableWorktrees(repositoryState.value));
+const targetWorktree = computed(() => {
+  if (isRemoving.value) {
+    return operationTargetWorktree.value;
+  }
 
-const removableWorktrees = computed(() => worktrees.value.filter((worktree) => worktree.isRemovable));
-const mainWorktree = computed(() => worktrees.value.find((worktree) => worktree.isMain));
+  if (targetWorktreeId.value === undefined) {
+    return undefined;
+  }
+
+  return removableWorktrees.value.find((worktree) => worktree.id === targetWorktreeId.value);
+});
+const isInitialLoad = computed(
+  () => repositoryState.value.kind === 'uncached' && repositoryState.value.refresh.kind !== 'failed'
+);
+const refreshError = computed(() => {
+  const refresh = repositoryState.value.refresh;
+  return refresh.kind === 'failed' ? refresh.message : '';
+});
+const notice = computed<PaletteNotice | undefined>(() => {
+  if (actionNotice.value) {
+    return actionNotice.value;
+  }
+
+  if (refreshError.value === '') {
+    return undefined;
+  }
+
+  return {
+    tone: 'error',
+    title: 'Worktrees refresh failed',
+    messages: [refreshError.value]
+  };
+});
 
 const paletteSummary = computed(() => {
-  if (isLoading.value) {
+  if (isInitialLoad.value) {
     return `Loading worktrees for ${props.repositoryId}`;
   }
 
@@ -54,16 +91,20 @@ const paletteSummary = computed(() => {
     return targetWorktree.value.workspaceId;
   }
 
+  if (repositoryState.value.kind === 'uncached') {
+    return `Worktrees unavailable for ${props.repositoryId}`;
+  }
+
   const worktreeLabel = removableWorktrees.value.length === 1 ? 'worktree' : 'worktrees';
   return `${removableWorktrees.value.length} removable ${worktreeLabel}`;
 });
 
 const statusMessage = computed(() => {
-  if (isLoading.value) {
+  if (isInitialLoad.value) {
     return 'Loading worktrees';
   }
 
-  if (loadError.value !== '' && removableWorktrees.value.length === 0) {
+  if (repositoryState.value.kind === 'uncached') {
     return 'Worktrees unavailable';
   }
 
@@ -74,25 +115,11 @@ const statusMessage = computed(() => {
   return 'No matching worktrees';
 });
 
-const loadWorktrees = async () => {
-  isLoading.value = true;
-  clearErrors();
-
-  try {
-    const { items } = await listRepositoryWorktrees(props.repositoryId);
-    worktrees.value = items;
-  } catch (requestError) {
-    setLoadError(requestError, 'Worktrees request failed');
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const navigateAfterRemovingCurrentWorktree = async () => {
+const navigateAfterRemovingCurrentWorktree = async (mainWorkspaceId: string | undefined) => {
   emit('close', false);
 
-  if (mainWorktree.value) {
-    await router.push({ name: 'workspace', params: { workspaceId: mainWorktree.value.workspaceId } });
+  if (mainWorkspaceId) {
+    await router.push({ name: 'workspace', params: { workspaceId: mainWorkspaceId } });
     return;
   }
 
@@ -104,17 +131,41 @@ const removeSelectedWorktree = async () => {
     return;
   }
 
+  const repositoryId = props.repositoryId;
+  const currentWorkspaceId = props.workspaceId;
   const target = targetWorktree.value;
+  if (repositoryId === '' || target.repositoryId !== repositoryId) {
+    return;
+  }
+
+  const initialMainWorkspaceId = worktrees.value.find((worktree) => worktree.isMain)?.workspaceId;
+  operationTargetWorktree.value = {
+    ...target,
+    branch: target.branch ? { ...target.branch } : null
+  };
   isRemoving.value = true;
   clearActionError();
+  let deletionSucceeded = false;
 
   try {
-    await deleteRepositoryWorktree(props.repositoryId, target.id);
+    await deleteRepositoryWorktree(repositoryId, target.id);
+    deletionSucceeded = true;
+    worktreeCache.remove(repositoryId, target.id);
     workspaceSessionStore.clearWorkspaceSession(target.workspaceId);
-    await syncWorkspaces();
+    const synchronisedWorkspaces = await syncWorkspaces();
 
-    if (target.workspaceId === props.workspaceId) {
-      await navigateAfterRemovingCurrentWorktree();
+    if (target.workspaceId === currentWorkspaceId) {
+      const latestRepositoryState = worktreeCache.observe(repositoryId);
+      const latestCachedMainWorkspaceId =
+        latestRepositoryState.kind === 'cached'
+          ? latestRepositoryState.worktrees.find((worktree) => worktree.isMain)?.workspaceId
+          : undefined;
+      const synchronisedMainWorkspaceId = synchronisedWorkspaces?.find(
+        (workspace) => workspace.repositoryId === repositoryId && workspace.worktree?.isMain
+      )?.id;
+      await navigateAfterRemovingCurrentWorktree(
+        latestCachedMainWorkspaceId ?? synchronisedMainWorkspaceId ?? initialMainWorkspaceId
+      );
       return;
     }
 
@@ -123,24 +174,42 @@ const removeSelectedWorktree = async () => {
     setActionError(requestError, 'Worktree removal failed');
   } finally {
     isRemoving.value = false;
+    operationTargetWorktree.value = undefined;
+
+    const shouldKeepSelection =
+      !deletionSucceeded &&
+      props.repositoryId === repositoryId &&
+      removableWorktrees.value.some((worktree) => worktree.repositoryId === repositoryId && worktree.id === target.id);
+    if (!shouldKeepSelection) {
+      targetWorktreeId.value = undefined;
+    }
   }
 };
 
-const selectWorktree = (worktree: DeepReadonly<Worktree>) => {
-  targetWorktree.value = worktree;
+const selectWorktree = (worktree: CachedWorktree) => {
+  if (isRemoving.value) {
+    return;
+  }
+
+  targetWorktreeId.value = worktree.id;
   query.value = '';
   clearActionError();
 };
 
 const cancelRemoval = () => {
-  targetWorktree.value = undefined;
+  if (isRemoving.value) {
+    return;
+  }
+
+  targetWorktreeId.value = undefined;
   clearActionError();
 };
 
 const { matchingItems: matchingWorktrees } = useFuzzyItems(
   removableWorktrees,
   query,
-  (worktree) => `${worktree.workspaceId} ${worktree.name} ${worktree.branch?.name ?? ''}`
+  (worktree) => worktree.workspaceId,
+  (worktree) => [worktree.workspaceId, worktree.name, worktree.branch?.name ?? '']
 );
 
 const paletteResults = computed<PaletteResult[]>(() => {
@@ -173,13 +242,31 @@ const paletteResults = computed<PaletteResult[]>(() => {
     id: `worktree:${match.item.id}`,
     label: match.item.workspaceId,
     actionLabel: match.item.branch?.name ?? 'Remove worktree',
-    isDisabled: isLoading.value,
+    isDisabled: isRemoving.value,
     run: () => selectWorktree(match.item)
   }));
 });
 
-onMounted(() => {
-  void loadWorktrees();
+watch(
+  () => props.repositoryId,
+  (repositoryId, previousRepositoryId) => {
+    if (repositoryId === '' || repositoryId === previousRepositoryId) {
+      return;
+    }
+
+    void worktreeCache.refresh(repositoryId);
+  },
+  { immediate: true }
+);
+
+watch(removableWorktrees, (nextWorktrees) => {
+  if (isRemoving.value) {
+    return;
+  }
+
+  if (targetWorktreeId.value !== undefined && !nextWorktrees.some(({ id }) => id === targetWorktreeId.value)) {
+    targetWorktreeId.value = undefined;
+  }
 });
 </script>
 

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteWorkspaceTerminals } from '@/api/generated/wade';
+import type { CurrentRepositoryContext } from '@/features/command-palette/composables/useCurrentRepositoryContext';
 import { useFuzzyItems } from '@/composables/useFuzzyItems';
 import PaletteShell from '@/features/command-palette/components/PaletteShell.vue';
 import type { PaletteNotice, PaletteResult } from '@/features/command-palette/types';
@@ -16,6 +17,10 @@ import { dispatchCancelReviewEvent } from '@/views/workspace/tabs/review/events/
 import { dispatchStartReviewEvent } from '@/views/workspace/tabs/review/events/startReview';
 import { dispatchSubmitReviewEvent } from '@/views/workspace/tabs/review/events/submitReview';
 
+const props = defineProps<{
+  currentRepositoryContext: CurrentRepositoryContext;
+}>();
+
 const emit = defineEmits<{
   close: [restoreFocus?: boolean];
   openWorkspacePicker: [];
@@ -24,6 +29,7 @@ const emit = defineEmits<{
   openCreateWorktree: [];
   openRemoteWorktreePicker: [];
   openRemoveWorktree: [];
+  openWorktreePicker: [];
 }>();
 
 const route = useRoute();
@@ -51,6 +57,7 @@ const hasPendingReviewComments = computed(() =>
   workspaceSessionStore.hasPendingReviewComments(currentWorkspaceId.value)
 );
 const hasRepository = computed(() => Boolean(workspaceDetails.value?.repositoryId));
+const hasCurrentRepositoryContext = computed(() => props.currentRepositoryContext.kind === 'available');
 
 const closeTerminalsActionLabel = computed(() => {
   if (currentWorkspaceId.value === '') {
@@ -239,6 +246,9 @@ const submitReviewCommand = computed<PaletteResult | undefined>(() => {
 const repositoryActionLabel = computed(() =>
   unavailableCommandLabel(hasRepository.value ? 'Select' : 'Not a Git workspace')
 );
+const worktreeSwitcherActionLabel = computed(() =>
+  unavailableCommandLabel(hasCurrentRepositoryContext.value ? 'Open switcher' : 'Not a Git workspace')
+);
 
 const commandDefinitions = computed<PaletteResult[]>(() => [
   {
@@ -293,6 +303,13 @@ const commandDefinitions = computed<PaletteResult[]>(() => [
     actionLabel: repositoryActionLabel.value,
     isDisabled: !hasRepository.value,
     run: openRemoveWorktree
+  },
+  {
+    id: 'open-worktree-switcher',
+    label: 'Open Worktree Switcher',
+    actionLabel: worktreeSwitcherActionLabel.value,
+    isDisabled: !hasCurrentRepositoryContext.value,
+    run: () => emit('openWorktreePicker')
   },
   {
     id: 'open-settings',

@@ -90,23 +90,27 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-watch(
-  () => props.query,
-  () => {
+watch([() => props.query, () => props.results], ([query, results], [previousQuery, previousResults]) => {
+  if (query !== previousQuery) {
     selectedIndex.value = 0;
+    return;
   }
-);
 
-watch(
-  () => props.results,
-  () => {
-    if (selectedIndex.value < props.results.length) {
+  const previouslySelectedId = previousResults[selectedIndex.value]?.id;
+  if (previouslySelectedId) {
+    const nextSelectedIndex = results.findIndex((result) => result.id === previouslySelectedId);
+    if (nextSelectedIndex !== -1) {
+      selectedIndex.value = nextSelectedIndex;
       return;
     }
-
-    selectedIndex.value = Math.max(0, props.results.length - 1);
   }
-);
+
+  if (selectedIndex.value < results.length) {
+    return;
+  }
+
+  selectedIndex.value = Math.max(0, results.length - 1);
+});
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown, true);
@@ -167,7 +171,15 @@ onBeforeUnmount(() => {
                 @click="runResult(result)"
               >
                 <span class="command-palette-result-presentation">
-                  <span>{{ result.label }}</span>
+                  <component
+                    v-if="result.leadingIcon"
+                    :is="result.leadingIcon"
+                    class="command-palette-result-leading-icon"
+                    :size="16"
+                    :stroke-width="1.75"
+                    aria-hidden="true"
+                  />
+                  <span class="command-palette-result-primary">{{ result.label }}</span>
                   <span v-if="result.secondaryLabel" class="command-palette-result-secondary">
                     <component
                       v-if="result.icon"
@@ -176,7 +188,7 @@ onBeforeUnmount(() => {
                       :stroke-width="1.75"
                       aria-hidden="true"
                     />
-                    <span>{{ result.secondaryLabel }}</span>
+                    <span class="command-palette-result-secondary-label">{{ result.secondaryLabel }}</span>
                   </span>
                 </span>
                 <span v-if="result.actionLabel" class="command-palette-result-action">{{ result.actionLabel }}</span>
@@ -364,23 +376,46 @@ onBeforeUnmount(() => {
 
 .command-palette-result-presentation {
   min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+}
+
+.command-palette-result-primary,
+.command-palette-result-secondary-label {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.command-palette-result-leading-icon {
+  flex: 0 0 auto;
+  margin-right: 8px;
+  color: #f8f8f2;
+}
+
+.command-palette-result-primary {
+  flex: 0 1 auto;
+}
+
 .command-palette-result-secondary {
-  display: inline-flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
   align-items: center;
   gap: 6px;
   margin-left: 12px;
   color: var(--muted);
   font-size: 12px;
-  vertical-align: middle;
 }
 
 .command-palette-result-secondary svg {
   flex: 0 0 auto;
+}
+
+.command-palette-result-secondary-label {
+  flex: 0 1 auto;
 }
 
 .command-palette-result-action {

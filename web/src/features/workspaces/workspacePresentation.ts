@@ -18,12 +18,14 @@ export const getWorkspacePresentation = (workspace: WorkspacePresentationInput):
   const root = getWorkspaceDisplayRoot(workspace);
   const branch = getWorkspaceDisplayBranch(workspace);
 
-  return {
-    root,
-    branch,
-    title: branch === '' ? root : `${root} ${branch}`
-  };
+  return createWorkspacePresentation(root, branch);
 };
+
+const createWorkspacePresentation = (root: string, branch: string): WorkspacePresentation => ({
+  root,
+  branch,
+  title: branch === '' ? root : `${root} ${branch}`
+});
 
 const getWorkspaceDisplayRoot = (workspace: WorkspacePresentationInput) => workspace.repositoryId ?? workspace.name;
 

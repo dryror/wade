@@ -11,6 +11,7 @@ export type PaletteNotice = {
 export type PaletteResult = {
   id: string;
   label: string;
+  leadingIcon?: Component;
   secondaryLabel?: string;
   icon?: Component;
   title?: string;

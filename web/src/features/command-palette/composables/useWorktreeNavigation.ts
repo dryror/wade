@@ -27,9 +27,7 @@ export const useWorktreeNavigation = () => {
     }
   };
 
-  const openWorktree = async (worktree: { workspaceId: string }, reservedTab?: Window) => {
-    await syncWorkspaces();
-
+  const navigateToWorktree = async (worktree: { workspaceId: string }, reservedTab?: Window) => {
     const route = router.resolve({ name: 'workspace', params: { workspaceId: worktree.workspaceId } });
     if (reservedTab && !reservedTab.closed) {
       try {
@@ -43,8 +41,17 @@ export const useWorktreeNavigation = () => {
     await router.push(route);
   };
 
+  const openWorktree = async (worktree: { workspaceId: string }, reservedTab?: Window) => {
+    await syncWorkspaces();
+    await navigateToWorktree(worktree, reservedTab);
+  };
+
+  const openExistingWorktree = (worktree: { workspaceId: string }, reservedTab?: Window) =>
+    navigateToWorktree(worktree, reservedTab);
+
   return {
     closeReservedWorktreeTab,
+    openExistingWorktree,
     openWorktree,
     reserveWorktreeTab
   };

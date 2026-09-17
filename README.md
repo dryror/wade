@@ -90,18 +90,19 @@ not stopped by `wade stop`.
 
 ## Keyboard shortcuts
 
-| Shortcut | Action |
-| --- | --- |
-| `Ctrl + K` | Open the command palette |
-| `Ctrl + P` | Open the workspace picker |
-| `Ctrl + S` | Open the active-workspace picker |
-| `Ctrl + Alt + T` | Toggle the scratchpad (`Ctrl + Option + T` on macOS) |
-| `Ctrl + B`, then `1` | Switch to Terminal |
-| `Ctrl + B`, then `2` | Switch to Server |
-| `Ctrl + B`, then `3` | Switch to Review |
-| `Ctrl + B`, then `4` | Open the scratchpad |
-| `Ctrl + B`, then `o` | Focus the next terminal pane |
-| `Ctrl + B`, then `z` | Zoom or restore the active Terminal pane |
+| Shortcut             | Action                                                    |
+| -------------------- | --------------------------------------------------------- |
+| `Ctrl + K`           | Open the command palette                                  |
+| `Ctrl + P`           | Open the workspace picker                                 |
+| `Ctrl + S`           | Open the active-workspace picker                          |
+| `Ctrl + Alt + S`     | Open the Worktree switcher (`Ctrl + Option + S` on macOS) |
+| `Ctrl + Alt + T`     | Toggle the scratchpad (`Ctrl + Option + T` on macOS)      |
+| `Ctrl + B`, then `1` | Switch to Terminal                                        |
+| `Ctrl + B`, then `2` | Switch to Server                                          |
+| `Ctrl + B`, then `3` | Switch to Review                                          |
+| `Ctrl + B`, then `4` | Open the scratchpad                                       |
+| `Ctrl + B`, then `o` | Focus the next terminal pane                              |
+| `Ctrl + B`, then `z` | Zoom or restore the active Terminal pane                  |
 
 ## Settings
 

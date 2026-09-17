@@ -6,6 +6,10 @@ import PaletteShell from '@/features/command-palette/components/PaletteShell.vue
 import { usePaletteRequestState } from '@/features/command-palette/composables/usePaletteRequestState';
 import { useWorktreeNavigation } from '@/features/command-palette/composables/useWorktreeNavigation';
 import type { PaletteResult } from '@/features/command-palette/types';
+import {
+  recordCreatedWorktree,
+  useRepositoryWorktreeCache
+} from '@/features/workspaces/composables/useRepositoryWorktreeCache';
 
 const props = defineProps<{
   repositoryId: string;
@@ -15,7 +19,13 @@ const emit = defineEmits<{
   close: [restoreFocus?: boolean];
 }>();
 
-const { closeReservedWorktreeTab, openWorktree: navigateToWorktree, reserveWorktreeTab } = useWorktreeNavigation();
+const {
+  closeReservedWorktreeTab,
+  openExistingWorktree: navigateToExistingWorktree,
+  openWorktree: navigateToWorktree,
+  reserveWorktreeTab
+} = useWorktreeNavigation();
+const worktreeCache = useRepositoryWorktreeCache();
 const remoteBranches = ref<Branch[]>([]);
 const createdWorktree = ref<Worktree | undefined>();
 const copyWarnings = computed(() => createdWorktree.value?.ignoredFileCopyWarnings ?? []);
@@ -99,7 +109,7 @@ const createOrOpenRemoteBranch = async (branch: Branch) => {
   }
 
   if (branch.checkedOutWorkspaceId) {
-    await navigateToWorktree({ workspaceId: branch.checkedOutWorkspaceId }, reserveWorktreeTab());
+    await navigateToExistingWorktree({ workspaceId: branch.checkedOutWorkspaceId }, reserveWorktreeTab());
     emit('close', false);
     return;
   }
@@ -112,6 +122,7 @@ const createOrOpenRemoteBranch = async (branch: Branch) => {
 
   try {
     const worktree = await createRepositoryWorktree(props.repositoryId, { branchRef: branch.ref });
+    recordCreatedWorktree(worktreeCache, worktree);
     if ((worktree.ignoredFileCopyWarnings?.length ?? 0) > 0) {
       closeReservedWorktreeTab(reservedTab);
       createdWorktree.value = worktree;
