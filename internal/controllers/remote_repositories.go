@@ -47,11 +47,7 @@ func (h RemoteRepositories) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for index := range remoteRepositories {
-		ids := workspaceIDs[remoteRepositories[index].ID]
-		if ids == nil {
-			ids = []string{}
-		}
-		remoteRepositories[index].LocalWorkspaceIDs = append([]string(nil), ids...)
+		remoteRepositories[index].LocalWorkspaceIDs = append([]string{}, workspaceIDs[remoteRepositories[index].ID]...)
 	}
 
 	writeJSON(w, http.StatusOK, RemoteRepositoryList{Items: remoteRepositories})
