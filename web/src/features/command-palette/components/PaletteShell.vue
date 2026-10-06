@@ -199,7 +199,7 @@ onBeforeUnmount(() => {
   align-items: start;
   justify-items: center;
   padding: min(18vh, 140px) 16px 16px;
-  background: rgb(0 0 0 / 28%);
+  background: rgb(var(--shade-rgb) / 28%);
   backdrop-filter: blur(2px);
 }
 
@@ -208,8 +208,8 @@ onBeforeUnmount(() => {
   overflow: hidden;
   border: 1px solid var(--text);
   border-radius: 0;
-  background: rgb(23 24 28 / 94%);
-  box-shadow: 0 24px 80px rgb(0 0 0 / 38%);
+  background: rgb(var(--window-rgb) / 94%);
+  box-shadow: 0 24px 80px rgb(var(--shade-rgb) / 38%);
   color: var(--text);
 }
 
@@ -281,13 +281,13 @@ onBeforeUnmount(() => {
 }
 
 #command-palette-notice[data-tone='warning'] {
-  border-color: #d29922;
-  background: rgb(210 153 34 / 14%);
+  border-color: var(--yellow);
+  background: rgb(var(--yellow-rgb) / 14%);
 }
 
 #command-palette-notice[data-tone='error'] {
-  border-color: #ff6e6e;
-  background: rgb(255 110 110 / 14%);
+  border-color: var(--red);
+  background: rgb(var(--red-rgb) / 14%);
 }
 
 #command-palette-notice h3,
@@ -301,11 +301,11 @@ onBeforeUnmount(() => {
 }
 
 #command-palette-notice[data-tone='warning'] h3 {
-  color: #d29922;
+  color: var(--yellow);
 }
 
 #command-palette-notice[data-tone='error'] h3 {
-  color: #ff6e6e;
+  color: var(--red);
 }
 
 #command-palette-notice ul {

@@ -5,13 +5,13 @@ import CommandPalette from '@/features/command-palette/CommandPalette.vue';
 import { useActiveWorkspaces } from '@/features/workspaces/composables/useActiveWorkspaces';
 import { useWorkspaces } from '@/features/workspaces/composables/useWorkspaces';
 import { useSettingsStore } from '@/stores/useSettingsStore';
-import { applyThemeAccentColor, storedThemeAccentColor } from '@/utils/theme';
+import { applyThemeMode, storedThemeMode } from '@/utils/theme';
 
 const { loadSettings } = useSettingsStore();
 const { syncActiveWorkspaces } = useActiveWorkspaces();
 const { syncWorkspaces } = useWorkspaces();
 
-applyThemeAccentColor(storedThemeAccentColor());
+applyThemeMode(storedThemeMode());
 
 onMounted(async () => {
   void syncActiveWorkspaces();

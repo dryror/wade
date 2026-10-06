@@ -1,6 +1,6 @@
 import type { Agent, LinearSettings, Settings } from '@/api/generated/wade';
 import { defaultShortcutModifier, normaliseShortcutModifier } from '@/utils/shortcutModifier';
-import { defaultThemeAccentColor, normaliseThemeAccentColor } from '@/utils/theme';
+import { defaultThemeMode, normaliseThemeMode } from '@/utils/theme';
 
 export type { Agent, LinearSettings, Settings };
 
@@ -16,7 +16,7 @@ export const createEmptySettings = (): Settings => ({
   copyIgnoredFilesOnWorktreeCreation: false,
   openWorktreesInNewTabs: false,
   worktreeCopyExcludes: [],
-  themeAccentColor: defaultThemeAccentColor,
+  themeMode: defaultThemeMode,
   shortcutModifier: defaultShortcutModifier,
   linear: {
     enabled: false,
@@ -33,7 +33,7 @@ export const cloneSettings = (settings: Settings): Settings => ({
   copyIgnoredFilesOnWorktreeCreation: settings.copyIgnoredFilesOnWorktreeCreation,
   openWorktreesInNewTabs: settings.openWorktreesInNewTabs,
   worktreeCopyExcludes: [...settings.worktreeCopyExcludes],
-  themeAccentColor: settings.themeAccentColor,
+  themeMode: settings.themeMode,
   shortcutModifier: settings.shortcutModifier,
   linear: { ...settings.linear }
 });
@@ -60,7 +60,7 @@ export const normaliseSettings = (settings: Settings): Settings => ({
   copyIgnoredFilesOnWorktreeCreation: settings.copyIgnoredFilesOnWorktreeCreation,
   openWorktreesInNewTabs: settings.openWorktreesInNewTabs,
   worktreeCopyExcludes: normaliseWorktreeCopyExcludes(settings.worktreeCopyExcludes),
-  themeAccentColor: normaliseThemeAccentColor(settings.themeAccentColor),
+  themeMode: normaliseThemeMode(settings.themeMode),
   shortcutModifier: normaliseShortcutModifier(settings.shortcutModifier),
   linear: {
     enabled: settings.linear.enabled,

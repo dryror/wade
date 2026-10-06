@@ -1,10 +1,10 @@
 package settings
 
-// Supported theme accent colour values.
+// Supported theme mode values.
 const (
-	ThemeAccentColorWhite  = "white"
-	ThemeAccentColorOrange = "orange"
-	ThemeAccentColorPurple = "purple"
+	ThemeModeDark   = "dark"
+	ThemeModeLight  = "light"
+	ThemeModeSystem = "system"
 )
 
 // Supported keyboard shortcut modifier values.
@@ -34,7 +34,7 @@ type Settings struct {
 	CopyIgnoredFilesOnWorktreeCreation bool           `json:"copyIgnoredFilesOnWorktreeCreation"`
 	OpenWorktreesInNewTabs             bool           `json:"openWorktreesInNewTabs"`
 	WorktreeCopyExcludes               []string       `json:"worktreeCopyExcludes"`
-	ThemeAccentColor                   string         `json:"themeAccentColor" enums:"white,orange,purple"`
+	ThemeMode                          string         `json:"themeMode" enums:"dark,light,system"`
 	ShortcutModifier                   string         `json:"shortcutModifier" enums:"ctrl,meta"`
 	Linear                             LinearSettings `json:"linear"`
 } // @name Settings

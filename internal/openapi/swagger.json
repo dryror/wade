@@ -2094,7 +2094,7 @@
                 "openWorktreesInNewTabs",
                 "shell",
                 "shortcutModifier",
-                "themeAccentColor",
+                "themeMode",
                 "workspaceDirectories",
                 "worktreeCopyExcludes"
             ],
@@ -2124,12 +2124,12 @@
                         "meta"
                     ]
                 },
-                "themeAccentColor": {
+                "themeMode": {
                     "type": "string",
                     "enum": [
-                        "white",
-                        "orange",
-                        "purple"
+                        "dark",
+                        "light",
+                        "system"
                     ]
                 },
                 "workspaceDirectories": {

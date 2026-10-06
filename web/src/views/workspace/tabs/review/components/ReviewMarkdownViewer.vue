@@ -383,7 +383,7 @@ const handleBlockClick = (block: MarkdownBlock, event: MouseEvent) => {
 .markdown-rendered-content :deep(code) {
   padding: 0.12em 0.35em;
   border: 1px solid rgb(var(--accent-rgb) / 24%);
-  background: rgb(0 0 0 / 22%);
+  background: rgb(var(--shade-rgb) / 22%);
   color: var(--text);
   font: inherit;
   font-size: 0.92em;
@@ -392,7 +392,7 @@ const handleBlockClick = (block: MarkdownBlock, event: MouseEvent) => {
 .markdown-rendered-content :deep(pre) {
   padding: 14px 16px;
   border: 1px solid rgb(var(--accent-rgb) / 32%);
-  background: rgb(0 0 0 / 24%);
+  background: rgb(var(--shade-rgb) / 24%);
   overflow: auto;
   line-height: 1.55;
   scrollbar-width: thin;

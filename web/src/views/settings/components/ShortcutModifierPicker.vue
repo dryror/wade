@@ -82,7 +82,7 @@ const shortcutModifier = defineModel<ShortcutModifier>('shortcutModifier', { req
   gap: 8px;
   padding: 9px 10px;
   border: 1px solid rgb(var(--accent-rgb) / 30%);
-  background: rgb(0 0 0 / 12%);
+  background: rgb(var(--shade-rgb) / 12%);
   color: var(--muted);
   font-size: 13px;
   cursor: pointer;

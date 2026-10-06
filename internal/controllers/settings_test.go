@@ -19,7 +19,7 @@ func TestUpdateSettingsDecodesModelResourceAndConfiguresRuntimeModels(t *testing
 	requested := settings.Settings{
 		WorkspaceDirectories: []string{"~/Code"},
 		Agents:               []settings.Agent{{Name: "Pi", Command: "pi -c", Default: true}},
-		ThemeAccentColor:     settings.ThemeAccentColorPurple,
+		ThemeMode:            settings.ThemeModeLight,
 	}
 	result := settings.UpdateResult{
 		Settings: requested,
@@ -71,7 +71,7 @@ func TestUpdateSettingsDecodesModelResourceAndConfiguresRuntimeModels(t *testing
 func TestUpdateSettingsMapsModelValidationError(t *testing.T) {
 	settingsModel := &fakeSettingsModel{updateError: settings.InvalidSettingsError{Err: errors.New("invalid")}}
 	controller := NewSettings(settingsModel, &fakeWorkspacesModel{}, &fakeRepositoriesModel{}, &fakeTerminalsModel{})
-	request := httptest.NewRequest(http.MethodPut, "/api/v1/settings", bytes.NewBufferString(`{"workspaceDirectories":[],"shell":"","agents":[],"copyIgnoredFilesOnWorktreeCreation":false,"openWorktreesInNewTabs":false,"worktreeCopyExcludes":[],"themeAccentColor":"white"}`))
+	request := httptest.NewRequest(http.MethodPut, "/api/v1/settings", bytes.NewBufferString(`{"workspaceDirectories":[],"shell":"","agents":[],"copyIgnoredFilesOnWorktreeCreation":false,"openWorktreesInNewTabs":false,"worktreeCopyExcludes":[],"themeMode":"dark"}`))
 	response := httptest.NewRecorder()
 
 	controller.Update(response, request)
@@ -176,7 +176,7 @@ func TestSettingsControllerSerialisesPersistenceAndRuntimeOrchestration(t *testi
 }
 
 func settingsUpdateRequest() *http.Request {
-	return httptest.NewRequest(http.MethodPut, "/api/v1/settings", bytes.NewBufferString(`{"workspaceDirectories":[],"shell":"","agents":[],"copyIgnoredFilesOnWorktreeCreation":false,"openWorktreesInNewTabs":false,"worktreeCopyExcludes":[],"themeAccentColor":"white"}`))
+	return httptest.NewRequest(http.MethodPut, "/api/v1/settings", bytes.NewBufferString(`{"workspaceDirectories":[],"shell":"","agents":[],"copyIgnoredFilesOnWorktreeCreation":false,"openWorktreesInNewTabs":false,"worktreeCopyExcludes":[],"themeMode":"dark"}`))
 }
 
 func runtimeResult(setting string, path string) settings.UpdateResult {

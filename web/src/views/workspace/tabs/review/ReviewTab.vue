@@ -1538,7 +1538,7 @@ button:not(:disabled):focus-visible {
 .review-error,
 .review-file-error {
   margin: 0;
-  color: #ff6e6e;
+  color: var(--red);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -1617,7 +1617,7 @@ button:not(:disabled):focus-visible {
   border: 1px solid var(--text);
   border-radius: 0;
   outline: none;
-  background: rgb(0 0 0 / 18%);
+  background: rgb(var(--shade-rgb) / 18%);
   color: var(--text);
   font: inherit;
   font-size: 12px;
@@ -1707,30 +1707,30 @@ button:not(:disabled):focus-visible {
 }
 
 .review-annotation-count {
-  border-color: #bd93f9;
-  color: #bd93f9;
+  border-color: var(--purple);
+  color: var(--purple);
 }
 
 .review-reviewed-marker {
-  border-color: #50fa7b;
-  color: #50fa7b;
+  border-color: var(--green);
+  color: var(--green);
 }
 
 .review-file-status {
-  color: #8be9fd;
+  color: var(--blue);
   font-size: 10px;
 }
 
 .review-file-status[data-status='added'] {
-  color: #69ff94;
+  color: var(--green);
 }
 
 .review-file-status[data-status='deleted'] {
-  color: #ff6e6e;
+  color: var(--red);
 }
 
 .review-file-status[data-status='renamed'] {
-  color: #f1fa8c;
+  color: var(--yellow);
 }
 
 .review-muted {
@@ -1815,9 +1815,9 @@ button:not(:disabled):focus-visible {
 }
 
 .review-header-actions button[data-active='true'] {
-  border-color: #50fa7b;
-  background: rgb(80 250 123 / 10%);
-  color: #50fa7b;
+  border-color: var(--green);
+  background: rgb(var(--green-rgb) / 10%);
+  color: var(--green);
 }
 
 .review-file-error {
@@ -1825,8 +1825,8 @@ button:not(:disabled):focus-visible {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgb(255 85 85 / 30%);
-  background: rgb(255 85 85 / 8%);
+  border-bottom: 1px solid rgb(var(--red-rgb) / 30%);
+  background: rgb(var(--red-rgb) / 8%);
 }
 
 .review-file-error p {
@@ -1842,7 +1842,7 @@ button:not(:disabled):focus-visible {
 }
 
 .review-annotation-sync-message {
-  color: #bd93f9;
+  color: var(--purple);
 }
 
 .review-file-error[data-visible='false'] {
@@ -1875,7 +1875,7 @@ button:not(:disabled):focus-visible {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(23 24 28 / 82%);
+  background: rgb(var(--window-rgb) / 82%);
 }
 
 .review-modal-card {
@@ -1928,14 +1928,14 @@ button:not(:disabled):focus-visible {
 }
 
 .review-kind-toggle[data-kind='question'] {
-  border-color: #d29922;
-  background: rgb(210 153 34 / 14%);
-  color: #d29922;
+  border-color: var(--yellow);
+  background: rgb(var(--yellow-rgb) / 14%);
+  color: var(--yellow);
 }
 
 .review-kind-toggle[data-kind='feedback'] {
-  border-color: #ff6e6e;
-  background: rgb(255 110 110 / 14%);
-  color: #ff6e6e;
+  border-color: var(--red);
+  background: rgb(var(--red-rgb) / 14%);
+  color: var(--red);
 }
 </style>

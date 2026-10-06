@@ -142,7 +142,7 @@ func TestGetReadsLegacyDirectoriesAndReturnsDetachedSettings(t *testing.T) {
 }
 
 func TestUpdateNormalisesPreservesUnknownKeysAndResolvesRuntimeConfiguration(t *testing.T) {
-	files := newSettingsFileSystem(`{"workspaceDirectories":["/old"],"agents":[{"name":"Old","command":"old","default":true}],"theme":"dark","projectDirectories":["~/Legacy"],"agentCommand":"legacy"}`)
+	files := newSettingsFileSystem(`{"workspaceDirectories":["/old"],"agents":[{"name":"Old","command":"old","default":true}],"theme":"dark","projectDirectories":["~/Legacy"],"agentCommand":"legacy","themeAccentColor":"purple"}`)
 	environment := testEnvironment()
 	environment.variables[addressEnvironmentVariable] = "custom.localhost:9000"
 	model := New(files, environment)
@@ -179,7 +179,7 @@ func TestUpdateNormalisesPreservesUnknownKeysAndResolvesRuntimeConfiguration(t *
 	if persisted["theme"] != "dark" {
 		t.Fatalf("unknown theme = %#v", persisted["theme"])
 	}
-	for _, removed := range []string{"projectDirectories", "agentCommand", "agentPaneCommand"} {
+	for _, removed := range []string{"projectDirectories", "agentCommand", "agentPaneCommand", "themeAccentColor"} {
 		if _, found := persisted[removed]; found {
 			t.Fatalf("legacy setting %q was preserved", removed)
 		}
@@ -214,7 +214,7 @@ func TestReloadNormalisesOutOfBandSettingsWithoutPersisting(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Reload() error = %v", err)
 	}
-	if result.Settings.WorkspaceDirectories[0] != "~/Code" || result.Settings.ThemeAccentColor != ThemeAccentColorWhite {
+	if result.Settings.WorkspaceDirectories[0] != "~/Code" || result.Settings.ThemeMode != ThemeModeDark {
 		t.Fatalf("Reload() settings = %#v", result.Settings)
 	}
 
@@ -308,6 +308,5 @@ func validSettings(workspaceDirectory string) Settings {
 			{Name: "Pi", Command: "pi -c", Default: true},
 		},
 		WorktreeCopyExcludes: []string{},
-		ThemeAccentColor:     ThemeAccentColorWhite,
 	}
 }

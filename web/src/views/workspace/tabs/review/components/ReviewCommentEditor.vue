@@ -122,7 +122,7 @@ onMounted(async () => {
   gap: 8px;
   padding: 8px;
   border: 1px solid rgb(var(--accent-rgb) / 45%);
-  background: rgb(0 0 0 / 12%);
+  background: rgb(var(--shade-rgb) / 12%);
 }
 
 .review-comment-editor header,
@@ -147,7 +147,7 @@ onMounted(async () => {
   border: 1px solid var(--text);
   border-radius: 0;
   outline: none;
-  background: rgb(0 0 0 / 18%);
+  background: rgb(var(--shade-rgb) / 18%);
   color: var(--text);
   font: inherit;
   font-size: 12px;
@@ -175,15 +175,15 @@ onMounted(async () => {
 }
 
 .review-comment-editor button[data-kind='feedback'] {
-  border-color: #ff6e6e;
-  background: rgb(255 110 110 / 14%);
-  color: #ff6e6e;
+  border-color: var(--red);
+  background: rgb(var(--red-rgb) / 14%);
+  color: var(--red);
 }
 
 .review-comment-editor button[data-kind='question'] {
-  border-color: #d29922;
-  background: rgb(210 153 34 / 14%);
-  color: #d29922;
+  border-color: var(--yellow);
+  background: rgb(var(--yellow-rgb) / 14%);
+  color: var(--yellow);
 }
 
 .review-comment-editor button:hover,

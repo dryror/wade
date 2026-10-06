@@ -1,4 +1,5 @@
 import type { Mermaid, MermaidConfig } from 'mermaid';
+import { resolvedThemeMode } from '@/utils/theme';
 
 let mermaidModulePromise: Promise<Mermaid> | null = null;
 let mermaidRenderQueue = Promise.resolve();
@@ -18,12 +19,12 @@ const getThemeVariable = (name: string, fallback: string) => {
 };
 
 const createMermaidConfig = (): MermaidConfig => {
-  const windowColour = getThemeVariable('--window', '#17181c');
-  const accentColour = getThemeVariable('--accent', '#f8f8f2');
+  const windowColour = getThemeVariable('--window', '#2d353b');
+  const accentColour = getThemeVariable('--accent', '#d3c6aa');
   const textColour = getThemeVariable('--text', accentColour);
 
   return {
-    darkMode: true,
+    darkMode: resolvedThemeMode() === 'dark',
     fontFamily: 'monospace',
     htmlLabels: false,
     securityLevel: 'strict',

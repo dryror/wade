@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router';
 import Checkbox from '@/components/Checkbox.vue';
 import AgentSettingsEditor from '@/views/settings/components/AgentSettingsEditor.vue';
 import ShortcutModifierPicker from '@/views/settings/components/ShortcutModifierPicker.vue';
-import ThemeAccentPicker from '@/views/settings/components/ThemeAccentPicker.vue';
+import ThemeModePicker from '@/views/settings/components/ThemeModePicker.vue';
 import { useSettingsForm } from '@/views/settings/composables/useSettingsForm';
 
 const {
@@ -32,7 +32,7 @@ const {
   updateOpenWorktreesInNewTabs,
   updateLinearEnabled,
   updateLinearWorkspace,
-  updateThemeAccentColor,
+  updateThemeMode,
   updateShortcutModifier,
   updateWorktreeCopyExclude,
   addWorktreeCopyExclude,
@@ -55,9 +55,9 @@ const isLinearEnabled = computed({
   set: updateLinearEnabled
 });
 
-const selectedThemeAccentColor = computed({
-  get: () => form.themeAccentColor,
-  set: updateThemeAccentColor
+const selectedThemeMode = computed({
+  get: () => form.themeMode,
+  set: updateThemeMode
 });
 
 const selectedShortcutModifier = computed({
@@ -87,7 +87,7 @@ onMounted(() => {
 
     <section id="settings-content" aria-label="Settings form">
       <form id="settings-form" @submit.prevent="submit">
-        <ThemeAccentPicker v-model:theme-accent-color="selectedThemeAccentColor" />
+        <ThemeModePicker v-model:theme-mode="selectedThemeMode" />
 
         <ShortcutModifierPicker v-model:shortcut-modifier="selectedShortcutModifier" />
 
@@ -495,7 +495,7 @@ onMounted(() => {
   min-width: 0;
   border: 1px solid rgb(var(--accent-rgb) / 30%);
   border-radius: 0;
-  background: rgb(0 0 0 / 18%);
+  background: rgb(var(--shade-rgb) / 18%);
   color: var(--text);
   font: inherit;
   padding: 9px 10px;

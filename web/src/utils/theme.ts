@@ -1,36 +1,67 @@
-export const themeAccentColors = ['white', 'purple', 'orange'] as const;
+export const themeModes = ['dark', 'light', 'system'] as const;
 
-export type ThemeAccentColor = (typeof themeAccentColors)[number];
+export type ThemeMode = (typeof themeModes)[number];
 
-export const defaultThemeAccentColor: ThemeAccentColor = 'white';
+export type ResolvedThemeMode = Exclude<ThemeMode, 'system'>;
 
-const storedThemeAccentColorKey = 'wade-theme-accent-color';
-const themeAccentColorChangedEvent = 'theme-accent-color-changed';
+export const defaultThemeMode: ThemeMode = 'dark';
 
-const themeAccentColorValues: Record<ThemeAccentColor, string> = {
-  white: '#f8f8f2',
-  orange: '#ffb86c',
-  purple: '#bd93f9'
+const storedThemeModeKey = 'wade-theme-mode';
+export const themeModeChangedEvent = 'theme-mode-changed';
+const lightColorSchemeQuery = '(prefers-color-scheme: light)';
+
+const themeModeLabels: Record<ThemeMode, string> = {
+  dark: 'Dark',
+  light: 'Light',
+  system: 'System'
 };
 
-export const themeAccentColorOptions = themeAccentColors.map((value) => ({
+export const themeModeOptions = themeModes.map((value) => ({
   value,
-  label: value[0].toUpperCase() + value.slice(1),
-  color: themeAccentColorValues[value]
+  label: themeModeLabels[value]
 }));
 
-export const isThemeAccentColor = (value: unknown): value is ThemeAccentColor =>
-  typeof value === 'string' && themeAccentColors.includes(value as ThemeAccentColor);
+export const isThemeMode = (value: unknown): value is ThemeMode =>
+  typeof value === 'string' && themeModes.includes(value as ThemeMode);
 
-export const normaliseThemeAccentColor = (value: unknown): ThemeAccentColor =>
-  isThemeAccentColor(value) ? value : defaultThemeAccentColor;
+export const normaliseThemeMode = (value: unknown): ThemeMode => (isThemeMode(value) ? value : defaultThemeMode);
 
-export const storedThemeAccentColor = () =>
-  normaliseThemeAccentColor(window.localStorage.getItem(storedThemeAccentColorKey));
+export const storedThemeMode = () => normaliseThemeMode(window.localStorage.getItem(storedThemeModeKey));
 
-export const applyThemeAccentColor = (color: unknown) => {
-  const themeAccentColor = normaliseThemeAccentColor(color);
-  document.documentElement.dataset.themeAccentColor = themeAccentColor;
-  window.localStorage.setItem(storedThemeAccentColorKey, themeAccentColor);
-  window.dispatchEvent(new CustomEvent(themeAccentColorChangedEvent, { detail: themeAccentColor }));
+export const resolvedThemeMode = (): ResolvedThemeMode =>
+  document.documentElement.dataset.themeMode === 'light' ? 'light' : 'dark';
+
+let selectedThemeMode: ThemeMode = defaultThemeMode;
+let colorSchemeQuery: MediaQueryList | undefined;
+
+const resolveThemeMode = (mode: ThemeMode): ResolvedThemeMode => {
+  if (mode !== 'system') {
+    return mode;
+  }
+
+  return colorSchemeQuery?.matches ? 'light' : 'dark';
+};
+
+const updateResolvedThemeMode = () => {
+  const themeMode = resolveThemeMode(selectedThemeMode);
+  if (document.documentElement.dataset.themeMode === themeMode) {
+    return;
+  }
+
+  document.documentElement.dataset.themeMode = themeMode;
+  const windowColour = getComputedStyle(document.documentElement).getPropertyValue('--window').trim();
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', windowColour);
+  window.dispatchEvent(new CustomEvent(themeModeChangedEvent, { detail: themeMode }));
+};
+
+export const applyThemeMode = (mode: unknown) => {
+  selectedThemeMode = normaliseThemeMode(mode);
+  window.localStorage.setItem(storedThemeModeKey, selectedThemeMode);
+
+  if (!colorSchemeQuery) {
+    colorSchemeQuery = window.matchMedia(lightColorSchemeQuery);
+    colorSchemeQuery.addEventListener('change', updateResolvedThemeMode);
+  }
+
+  updateResolvedThemeMode();
 };

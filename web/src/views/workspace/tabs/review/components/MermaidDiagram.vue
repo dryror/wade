@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { themeModeChangedEvent } from '@/utils/theme';
 import { useMermaidRenderer } from '../composables/useMermaidRenderer';
 
 const props = defineProps<{
@@ -37,7 +38,7 @@ const renderDiagram = async () => {
   }
 };
 
-const handleThemeAccentChange = () => {
+const handleThemeChange = () => {
   void renderDiagram();
 };
 
@@ -48,12 +49,12 @@ watch(
 );
 
 onMounted(() => {
-  window.addEventListener('theme-accent-color-changed', handleThemeAccentChange);
+  window.addEventListener(themeModeChangedEvent, handleThemeChange);
 });
 
 onBeforeUnmount(() => {
   latestRenderRequest += 1;
-  window.removeEventListener('theme-accent-color-changed', handleThemeAccentChange);
+  window.removeEventListener(themeModeChangedEvent, handleThemeChange);
 });
 </script>
 
@@ -76,7 +77,7 @@ onBeforeUnmount(() => {
   margin: 0.8em 0;
   padding: 12px;
   border: 1px solid rgb(var(--accent-rgb) / 32%);
-  background: rgb(0 0 0 / 12%);
+  background: rgb(var(--shade-rgb) / 12%);
   overflow: auto;
   scrollbar-width: thin;
 }
@@ -110,7 +111,7 @@ onBeforeUnmount(() => {
 }
 
 .mermaid-diagram-error-message {
-  color: #ff6e6e;
+  color: var(--red);
   overflow-wrap: anywhere;
 }
 
@@ -119,7 +120,7 @@ onBeforeUnmount(() => {
   margin: 0;
   padding: 10px;
   border: 1px solid rgb(var(--accent-rgb) / 24%);
-  background: rgb(0 0 0 / 18%);
+  background: rgb(var(--shade-rgb) / 18%);
   overflow: auto;
   white-space: pre-wrap;
   overflow-wrap: anywhere;

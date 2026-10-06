@@ -146,7 +146,7 @@ button:disabled {
   min-width: 0;
   border: 1px solid rgb(var(--accent-rgb) / 30%);
   border-radius: 0;
-  background: rgb(0 0 0 / 18%);
+  background: rgb(var(--shade-rgb) / 18%);
   color: var(--text);
   font: inherit;
   padding: 9px 10px;
@@ -168,7 +168,7 @@ button:disabled {
   gap: 8px;
   padding: 9px 10px;
   border: 1px solid rgb(var(--accent-rgb) / 30%);
-  background: rgb(0 0 0 / 12%);
+  background: rgb(var(--shade-rgb) / 12%);
   color: var(--muted);
   cursor: pointer;
 }

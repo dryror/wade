@@ -74,7 +74,7 @@ defineExpose({
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgb(0 0 0 / 28%);
+  background: rgb(var(--shade-rgb) / 28%);
   backdrop-filter: blur(2px);
 }
 
@@ -85,8 +85,8 @@ defineExpose({
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--text);
-  background: rgb(23 24 28 / 94%);
-  box-shadow: 0 24px 80px rgb(0 0 0 / 38%);
+  background: rgb(var(--window-rgb) / 94%);
+  box-shadow: 0 24px 80px rgb(var(--shade-rgb) / 38%);
 }
 
 #scratchpad-terminal :deep(.terminal-pane) {

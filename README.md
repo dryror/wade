@@ -136,7 +136,7 @@ A complete configuration looks like this:
   "copyIgnoredFilesOnWorktreeCreation": false,
   "openWorktreesInNewTabs": false,
   "worktreeCopyExcludes": [],
-  "themeAccentColor": "white",
+  "themeMode": "dark",
   "shortcutModifier": "ctrl",
   "linear": {
     "enabled": false,

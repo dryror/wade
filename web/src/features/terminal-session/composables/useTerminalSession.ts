@@ -1,5 +1,5 @@
 import { readonly, type Ref, ref, watch } from 'vue';
-import { Terminal } from '@xterm/xterm';
+import { type ITheme, Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { WebglAddon } from '@xterm/addon-webgl';
@@ -8,6 +8,7 @@ import { useActiveWorkspaces } from '@/features/workspaces/composables/useActive
 import { useRecentWorkspaces } from '@/features/workspaces/composables/useRecentWorkspaces';
 import { WadeHTTPError } from '@/api/httpClient';
 import { createTerminalWebSocket } from '@/features/terminal-session/createTerminalWebSocket';
+import { resolvedThemeMode, themeModeChangedEvent, type ResolvedThemeMode } from '@/utils/theme';
 
 type Disposable = {
   dispose: () => void;
@@ -81,6 +82,55 @@ const openHttpLink = (_event: MouseEvent, uri: string) => {
   window.open(url.toString(), '_blank', 'noopener,noreferrer');
 };
 
+const terminalThemes: Record<ResolvedThemeMode, ITheme> = {
+  dark: {
+    background: '#2d353b',
+    foreground: '#d3c6aa',
+    cursor: '#d3c6aa',
+    cursorAccent: '#2d353b',
+    selectionBackground: '#543a48',
+    black: '#475258',
+    red: '#e67e80',
+    green: '#a7c080',
+    yellow: '#dbbc7f',
+    blue: '#7fbbb3',
+    magenta: '#d699b6',
+    cyan: '#83c092',
+    white: '#d3c6aa',
+    brightBlack: '#859289',
+    brightRed: '#e67e80',
+    brightGreen: '#a7c080',
+    brightYellow: '#dbbc7f',
+    brightBlue: '#7fbbb3',
+    brightMagenta: '#d699b6',
+    brightCyan: '#83c092',
+    brightWhite: '#d3c6aa'
+  },
+  light: {
+    background: '#fdf6e3',
+    foreground: '#5c6a72',
+    cursor: '#5c6a72',
+    cursorAccent: '#fdf6e3',
+    selectionBackground: '#e6e2cc',
+    black: '#5c6a72',
+    red: '#f85552',
+    green: '#8da101',
+    yellow: '#dfa000',
+    blue: '#3a94c5',
+    magenta: '#df69ba',
+    cyan: '#35a77c',
+    white: '#e6e2cc',
+    brightBlack: '#829181',
+    brightRed: '#f85552',
+    brightGreen: '#8da101',
+    brightYellow: '#dfa000',
+    brightBlue: '#3a94c5',
+    brightMagenta: '#df69ba',
+    brightCyan: '#35a77c',
+    brightWhite: '#f4f0d9'
+  }
+};
+
 const createTerminal = () =>
   new Terminal({
     cursorBlink: true,
@@ -94,29 +144,7 @@ const createTerminal = () =>
     lineHeight: 1,
     rescaleOverlappingGlyphs: true,
     scrollback: 10000,
-    theme: {
-      background: '#17181c',
-      foreground: '#f8f8f2',
-      cursor: '#f8f8f0',
-      cursorAccent: '#17181c',
-      selectionBackground: '#45475a',
-      black: '#21222c',
-      red: '#ff5555',
-      green: '#50fa7b',
-      yellow: '#f1fa8c',
-      blue: '#bd93f9',
-      magenta: '#ff79c6',
-      cyan: '#8be9fd',
-      white: '#f8f8f2',
-      brightBlack: '#6272a4',
-      brightRed: '#ff6e6e',
-      brightGreen: '#69ff94',
-      brightYellow: '#ffffa5',
-      brightBlue: '#d6acff',
-      brightMagenta: '#ff92df',
-      brightCyan: '#a4ffff',
-      brightWhite: '#ffffff'
-    }
+    theme: terminalThemes[resolvedThemeMode()]
   });
 
 export const useTerminalSession = ({
@@ -396,6 +424,14 @@ export const useTerminalSession = ({
     }
   });
 
+  const applyTerminalTheme = () => {
+    if (!terminal) {
+      return;
+    }
+
+    terminal.options.theme = terminalThemes[resolvedThemeMode()];
+  };
+
   const stop = () => {
     isStopped = true;
     sessionRun += 1;
@@ -405,6 +441,7 @@ export const useTerminalSession = ({
     resizeObserver?.disconnect();
     disposeWebglAddon();
     window.removeEventListener('resize', fitAndResize);
+    window.removeEventListener(themeModeChangedEvent, applyTerminalTheme);
     document.removeEventListener('keydown', handleEscapeKey, true);
     socket?.close();
     terminal?.dispose();
@@ -458,6 +495,7 @@ export const useTerminalSession = ({
     resizeObserver = new ResizeObserver(fitAndResize);
     resizeObserver.observe(terminalElement.value);
     window.addEventListener('resize', fitAndResize);
+    window.addEventListener(themeModeChangedEvent, applyTerminalTheme);
     document.addEventListener('keydown', handleEscapeKey, true);
 
     fitAndResize();

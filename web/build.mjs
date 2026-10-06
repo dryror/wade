@@ -144,7 +144,7 @@ const writeIndexHtml = () =>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17181c">
+  <meta name="theme-color" content="#2d353b">
   <title>WADE</title>
   <link rel="icon" href="/static/favicon.ico" type="image/x-icon" sizes="any">
   <link rel="icon" href="/static/favicon-32x32.png" type="image/png" sizes="32x32">

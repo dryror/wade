@@ -24,7 +24,7 @@ type settingsFile struct {
 	CopyIgnoredFilesOnWorktreeCreation *bool           `json:"copyIgnoredFilesOnWorktreeCreation"`
 	OpenWorktreesInNewTabs             *bool           `json:"openWorktreesInNewTabs"`
 	WorktreeCopyExcludes               *[]string       `json:"worktreeCopyExcludes"`
-	ThemeAccentColor                   *string         `json:"themeAccentColor"`
+	ThemeMode                          *string         `json:"themeMode"`
 	ShortcutModifier                   *string         `json:"shortcutModifier"`
 	Linear                             *LinearSettings `json:"linear"`
 }
@@ -37,7 +37,7 @@ func defaultSettings() Settings {
 		CopyIgnoredFilesOnWorktreeCreation: false,
 		OpenWorktreesInNewTabs:             false,
 		WorktreeCopyExcludes:               []string{},
-		ThemeAccentColor:                   ThemeAccentColorWhite,
+		ThemeMode:                          ThemeModeDark,
 		ShortcutModifier:                   ShortcutModifierCtrl,
 		Linear:                             LinearSettings{Enabled: false, Workspace: ""},
 	}
@@ -75,10 +75,10 @@ func parseSettings(contents []byte) (persistedSettings, error) {
 	if file.WorktreeCopyExcludes != nil {
 		settings.WorktreeCopyExcludes = cloneStrings(*file.WorktreeCopyExcludes)
 	}
-	if file.ThemeAccentColor != nil {
-		themeAccentColor := normaliseThemeAccentColor(*file.ThemeAccentColor)
-		if validateThemeAccentColor(themeAccentColor) == nil {
-			settings.ThemeAccentColor = themeAccentColor
+	if file.ThemeMode != nil {
+		themeMode := normaliseThemeMode(*file.ThemeMode)
+		if validateThemeMode(themeMode) == nil {
+			settings.ThemeMode = themeMode
 		}
 	}
 	if file.ShortcutModifier != nil {
@@ -102,6 +102,7 @@ func encodeSettings(settings Settings, existing map[string]json.RawMessage) ([]b
 	delete(raw, "agentCommand")
 	delete(raw, "agentPaneCommand")
 	delete(raw, "projectDirectories")
+	delete(raw, "themeAccentColor")
 
 	knownSettings := []struct {
 		name  string
@@ -113,7 +114,7 @@ func encodeSettings(settings Settings, existing map[string]json.RawMessage) ([]b
 		{name: "copyIgnoredFilesOnWorktreeCreation", value: settings.CopyIgnoredFilesOnWorktreeCreation},
 		{name: "openWorktreesInNewTabs", value: settings.OpenWorktreesInNewTabs},
 		{name: "worktreeCopyExcludes", value: settings.WorktreeCopyExcludes},
-		{name: "themeAccentColor", value: normaliseThemeAccentColor(settings.ThemeAccentColor)},
+		{name: "themeMode", value: normaliseThemeMode(settings.ThemeMode)},
 		{name: "shortcutModifier", value: normaliseShortcutModifier(settings.ShortcutModifier)},
 		{name: "linear", value: LinearSettings{
 			Enabled:   settings.Linear.Enabled,

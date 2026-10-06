@@ -5,7 +5,7 @@ import { useRecentWorkspaces } from '@/features/workspaces/composables/useRecent
 import { useWorkspaces } from '@/features/workspaces/composables/useWorkspaces';
 import { useWorkspaceDetailsStore } from '@/stores/useWorkspaceDetailsStore';
 import { cloneSettings, createEmptySettings, normaliseSettings, type Settings } from '@/types/settings';
-import { applyThemeAccentColor } from '@/utils/theme';
+import { applyThemeMode } from '@/utils/theme';
 
 const errorMessage = (error: unknown, fallback: string) => (error instanceof Error ? error.message : fallback);
 
@@ -64,7 +64,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
         replaceSettings(nextSettings);
         state.hasLoaded = true;
-        applyThemeAccentColor(state.settings.themeAccentColor);
+        applyThemeMode(state.settings.themeMode);
 
         return currentSettings();
       } catch (requestError) {
@@ -96,7 +96,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
         replaceSettings(savedSettings);
         state.hasLoaded = true;
-        applyThemeAccentColor(state.settings.themeAccentColor);
+        applyThemeMode(state.settings.themeMode);
 
         const availableWorkspaces = await syncWorkspaces();
         if (availableWorkspaces) {
@@ -122,7 +122,7 @@ export const useSettingsStore = defineStore('settings', () => {
     const reloadedSettings = await reloadSettings();
     replaceSettings(reloadedSettings);
     state.hasLoaded = true;
-    applyThemeAccentColor(state.settings.themeAccentColor);
+    applyThemeMode(state.settings.themeMode);
 
     return currentSettings();
   };

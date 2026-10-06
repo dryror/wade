@@ -36,8 +36,8 @@ func normaliseAndValidateSettings(settings Settings, homeDirectory string, files
 		return Settings{}, err
 	}
 
-	settings.ThemeAccentColor = normaliseThemeAccentColor(settings.ThemeAccentColor)
-	if err := validateThemeAccentColor(settings.ThemeAccentColor); err != nil {
+	settings.ThemeMode = normaliseThemeMode(settings.ThemeMode)
+	if err := validateThemeMode(settings.ThemeMode); err != nil {
 		return Settings{}, err
 	}
 
@@ -172,21 +172,21 @@ func validateLinearSettings(linear LinearSettings) error {
 	return nil
 }
 
-func validateThemeAccentColor(color string) error {
-	switch color {
-	case ThemeAccentColorWhite, ThemeAccentColorOrange, ThemeAccentColorPurple:
+func validateThemeMode(mode string) error {
+	switch mode {
+	case ThemeModeDark, ThemeModeLight, ThemeModeSystem:
 		return nil
 	default:
-		return fmt.Errorf("invalid theme accent color %q", color)
+		return fmt.Errorf("invalid theme mode %q", mode)
 	}
 }
 
-func normaliseThemeAccentColor(color string) string {
-	color = strings.TrimSpace(color)
-	if color == "" {
-		return ThemeAccentColorWhite
+func normaliseThemeMode(mode string) string {
+	mode = strings.TrimSpace(mode)
+	if mode == "" {
+		return ThemeModeDark
 	}
-	return color
+	return mode
 }
 
 func validateShortcutModifier(modifier string) error {

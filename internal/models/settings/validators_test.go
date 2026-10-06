@@ -87,8 +87,8 @@ func TestNormaliseAndValidateSettingsRejectsInvalidDomainValues(t *testing.T) {
 		"invalid worktree exclude": func(settings *Settings) {
 			settings.WorktreeCopyExcludes = []string{"["}
 		},
-		"invalid theme accent": func(settings *Settings) {
-			settings.ThemeAccentColor = "blue"
+		"invalid theme mode": func(settings *Settings) {
+			settings.ThemeMode = "sepia"
 		},
 		"invalid shortcut modifier": func(settings *Settings) {
 			settings.ShortcutModifier = "alt"
@@ -110,7 +110,7 @@ func TestNormaliseAndValidateSettingsTrimsValuesAndDefaultsTheme(t *testing.T) {
 	request.Agents[0].Name = " Pi "
 	request.Agents[0].Command = " pi -c "
 	request.WorktreeCopyExcludes = []string{" node_modules ", ""}
-	request.ThemeAccentColor = ""
+	request.ThemeMode = ""
 	request.ShortcutModifier = ""
 
 	normalised, err := normaliseAndValidateSettings(request, "/home/test", &settingsFileSystemStub{}, testEnvironment())
@@ -123,8 +123,8 @@ func TestNormaliseAndValidateSettingsTrimsValuesAndDefaultsTheme(t *testing.T) {
 	if len(normalised.WorktreeCopyExcludes) != 1 || normalised.WorktreeCopyExcludes[0] != "node_modules" {
 		t.Fatalf("WorktreeCopyExcludes = %#v", normalised.WorktreeCopyExcludes)
 	}
-	if normalised.ThemeAccentColor != ThemeAccentColorWhite {
-		t.Fatalf("ThemeAccentColor = %q", normalised.ThemeAccentColor)
+	if normalised.ThemeMode != ThemeModeDark {
+		t.Fatalf("ThemeMode = %q", normalised.ThemeMode)
 	}
 	if normalised.ShortcutModifier != ShortcutModifierCtrl {
 		t.Fatalf("ShortcutModifier = %q", normalised.ShortcutModifier)

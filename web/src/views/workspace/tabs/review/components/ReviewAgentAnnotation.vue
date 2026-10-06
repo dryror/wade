@@ -87,8 +87,8 @@ const handleDelete = (event: Event) => {
   display: grid;
   gap: 7px;
   padding: 10px;
-  border: 1px solid rgb(189 147 249 / 68%);
-  background: rgb(189 147 249 / 8%);
+  border: 1px solid rgb(var(--purple-rgb) / 68%);
+  background: rgb(var(--purple-rgb) / 8%);
 }
 
 .review-agent-annotation header {
@@ -97,7 +97,7 @@ const handleDelete = (event: Event) => {
   justify-content: space-between;
   gap: 8px;
   padding-right: 24px;
-  color: #bd93f9;
+  color: var(--purple);
   font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -114,14 +114,14 @@ const handleDelete = (event: Event) => {
   place-items: center;
   border: 1px solid transparent;
   background: transparent;
-  color: #858b96;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .review-agent-annotation-delete:hover,
 .review-agent-annotation-delete:focus-visible {
-  border-color: #858b96;
-  background: rgb(133 139 150 / 16%);
+  border-color: var(--muted);
+  background: rgb(var(--muted-rgb) / 16%);
   color: var(--text);
 }
 
@@ -148,6 +148,6 @@ const handleDelete = (event: Event) => {
 }
 
 .review-agent-annotation-error {
-  color: #ff6e6e;
+  color: var(--red);
 }
 </style>

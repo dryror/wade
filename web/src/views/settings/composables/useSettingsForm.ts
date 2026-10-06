@@ -1,7 +1,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, readonly, ref } from 'vue';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import type { ShortcutModifier } from '@/utils/shortcutModifier';
-import { applyThemeAccentColor, type ThemeAccentColor } from '@/utils/theme';
+import { applyThemeMode, type ThemeMode } from '@/utils/theme';
 import {
   cloneSettings,
   createEmptySettings,
@@ -20,7 +20,7 @@ const settingsHaveChanged = (current: Settings, saved: Settings) =>
   current.copyIgnoredFilesOnWorktreeCreation !== saved.copyIgnoredFilesOnWorktreeCreation ||
   current.openWorktreesInNewTabs !== saved.openWorktreesInNewTabs ||
   JSON.stringify(current.worktreeCopyExcludes) !== JSON.stringify(saved.worktreeCopyExcludes) ||
-  current.themeAccentColor !== saved.themeAccentColor ||
+  current.themeMode !== saved.themeMode ||
   current.shortcutModifier !== saved.shortcutModifier ||
   current.linear.enabled !== saved.linear.enabled ||
   current.linear.workspace !== saved.linear.workspace;
@@ -72,7 +72,7 @@ export const useSettingsForm = () => {
     form.copyIgnoredFilesOnWorktreeCreation = settings.copyIgnoredFilesOnWorktreeCreation;
     form.openWorktreesInNewTabs = settings.openWorktreesInNewTabs;
     form.worktreeCopyExcludes = [...settings.worktreeCopyExcludes];
-    form.themeAccentColor = settings.themeAccentColor;
+    form.themeMode = settings.themeMode;
     form.shortcutModifier = settings.shortcutModifier;
     form.linear = { ...settings.linear };
   };
@@ -85,7 +85,7 @@ export const useSettingsForm = () => {
       const settings = await loadSavedSettings({ force: true });
       replaceForm(settings);
       savedSettings.value = normaliseSettings(settings);
-      applyThemeAccentColor(settings.themeAccentColor);
+      applyThemeMode(settings.themeMode);
     } catch (requestError) {
       error.value = errorMessage(requestError, 'Settings request failed');
     } finally {
@@ -204,9 +204,9 @@ export const useSettingsForm = () => {
     clearMessages();
   };
 
-  const updateThemeAccentColor = (themeAccentColor: ThemeAccentColor) => {
-    form.themeAccentColor = themeAccentColor;
-    applyThemeAccentColor(themeAccentColor);
+  const updateThemeMode = (themeMode: ThemeMode) => {
+    form.themeMode = themeMode;
+    applyThemeMode(themeMode);
     clearMessages();
   };
 
@@ -245,7 +245,7 @@ export const useSettingsForm = () => {
 
     replaceForm(settings);
     savedSettings.value = cloneSettings(settings);
-    applyThemeAccentColor(settings.themeAccentColor);
+    applyThemeMode(settings.themeMode);
     statusMessage.value = 'Settings saved';
   };
 
@@ -271,8 +271,8 @@ export const useSettingsForm = () => {
   });
 
   onBeforeUnmount(() => {
-    if (normalisedSettings.value.themeAccentColor !== savedSettings.value.themeAccentColor) {
-      applyThemeAccentColor(savedSettings.value.themeAccentColor);
+    if (normalisedSettings.value.themeMode !== savedSettings.value.themeMode) {
+      applyThemeMode(savedSettings.value.themeMode);
     }
   });
 
@@ -301,7 +301,7 @@ export const useSettingsForm = () => {
     updateOpenWorktreesInNewTabs,
     updateLinearEnabled,
     updateLinearWorkspace,
-    updateThemeAccentColor,
+    updateThemeMode,
     updateShortcutModifier,
     updateWorktreeCopyExclude,
     addWorktreeCopyExclude,

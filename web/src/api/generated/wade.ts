@@ -223,13 +223,13 @@ export const SettingsShortcutModifier = {
   meta: 'meta',
 } as const;
 
-export type SettingsThemeAccentColor = typeof SettingsThemeAccentColor[keyof typeof SettingsThemeAccentColor];
+export type SettingsThemeMode = typeof SettingsThemeMode[keyof typeof SettingsThemeMode];
 
 
-export const SettingsThemeAccentColor = {
-  white: 'white',
-  orange: 'orange',
-  purple: 'purple',
+export const SettingsThemeMode = {
+  dark: 'dark',
+  light: 'light',
+  system: 'system',
 } as const;
 
 export interface Settings {
@@ -239,7 +239,7 @@ export interface Settings {
   openWorktreesInNewTabs: boolean;
   shell: string;
   shortcutModifier: SettingsShortcutModifier;
-  themeAccentColor: SettingsThemeAccentColor;
+  themeMode: SettingsThemeMode;
   workspaceDirectories: string[];
   worktreeCopyExcludes: string[];
 }

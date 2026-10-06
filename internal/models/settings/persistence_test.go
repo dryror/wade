@@ -26,7 +26,7 @@ func TestParseSettingsAppliesConfiguredValues(t *testing.T) {
 		"copyIgnoredFilesOnWorktreeCreation":true,
 		"openWorktreesInNewTabs":true,
 		"worktreeCopyExcludes":["node_modules"],
-		"themeAccentColor":"purple",
+		"themeMode":"system",
 		"shortcutModifier":"meta",
 		"linear":{"enabled":true,"workspace":" Example_Workspace "}
 	}`))
@@ -41,7 +41,7 @@ func TestParseSettingsAppliesConfiguredValues(t *testing.T) {
 	if len(settings.Agents) != 1 || settings.Agents[0].Name != "Custom" {
 		t.Fatalf("Agents = %#v", settings.Agents)
 	}
-	if !reflect.DeepEqual(settings.WorktreeCopyExcludes, []string{"node_modules"}) || settings.ThemeAccentColor != ThemeAccentColorPurple || settings.ShortcutModifier != ShortcutModifierMeta {
+	if !reflect.DeepEqual(settings.WorktreeCopyExcludes, []string{"node_modules"}) || settings.ThemeMode != ThemeModeSystem || settings.ShortcutModifier != ShortcutModifierMeta {
 		t.Fatalf("settings = %#v", settings)
 	}
 	if !settings.Linear.Enabled || settings.Linear.Workspace != "Example_Workspace" {
@@ -60,13 +60,13 @@ func TestParseSettingsPreservesEmptyArrays(t *testing.T) {
 	}
 }
 
-func TestParseSettingsFallsBackForInvalidThemeAccent(t *testing.T) {
-	persisted, err := parseSettings([]byte(`{"themeAccentColor":"blue"}`))
+func TestParseSettingsFallsBackForInvalidThemeMode(t *testing.T) {
+	persisted, err := parseSettings([]byte(`{"themeMode":"sepia"}`))
 	if err != nil {
 		t.Fatalf("parseSettings() error = %v", err)
 	}
-	if persisted.settings.ThemeAccentColor != ThemeAccentColorWhite {
-		t.Fatalf("ThemeAccentColor = %q", persisted.settings.ThemeAccentColor)
+	if persisted.settings.ThemeMode != ThemeModeDark {
+		t.Fatalf("ThemeMode = %q", persisted.settings.ThemeMode)
 	}
 }
 

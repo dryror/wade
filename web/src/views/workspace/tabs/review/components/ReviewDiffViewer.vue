@@ -14,6 +14,7 @@ import {
 } from 'vue';
 import type { ReviewAnnotation } from '@/api/generated/wade';
 import type { AnnotationDeletionDisplay, CommentSide, ReviewComment, ReviewFileContents } from '@/types/review';
+import { resolvedThemeMode, themeModeChangedEvent, type ResolvedThemeMode } from '@/utils/theme';
 import ReviewAgentAnnotation from './ReviewAgentAnnotation.vue';
 import ReviewCommentEditor from './ReviewCommentEditor.vue';
 
@@ -115,6 +116,29 @@ declare global {
     require?: MonacoRequire;
   }
 }
+
+const reviewEditorThemes: Record<ResolvedThemeMode, { name: string; base: string; colors: Record<string, string> }> = {
+  dark: {
+    name: 'wade-review-dark',
+    base: 'vs-dark',
+    colors: {
+      'editor.background': '#2d353b',
+      'editor.foreground': '#d3c6aa',
+      'diffEditor.insertedTextBackground': '#a7c08026',
+      'diffEditor.removedTextBackground': '#e67e8026'
+    }
+  },
+  light: {
+    name: 'wade-review-light',
+    base: 'vs',
+    colors: {
+      'editor.background': '#fdf6e3',
+      'editor.foreground': '#5c6a72',
+      'diffEditor.insertedTextBackground': '#8da10126',
+      'diffEditor.removedTextBackground': '#f8555226'
+    }
+  }
+};
 
 const props = withDefaults(
   defineProps<{
@@ -826,6 +850,10 @@ const wireLineCommentHandlers = () => {
   ];
 };
 
+const applyEditorTheme = () => {
+  monaco.value?.editor.setTheme(reviewEditorThemes[resolvedThemeMode()].name);
+};
+
 const createEditor = async () => {
   if (!editorElement.value) {
     return;
@@ -833,17 +861,10 @@ const createEditor = async () => {
 
   try {
     monaco.value = await loadMonaco();
-    monaco.value.editor.defineTheme('wade-review', {
-      base: 'vs-dark',
-      inherit: true,
-      rules: [],
-      colors: {
-        'editor.background': '#17181c',
-        'diffEditor.insertedTextBackground': '#50fa7b26',
-        'diffEditor.removedTextBackground': '#ff555526'
-      }
-    });
-    monaco.value.editor.setTheme('wade-review');
+    Object.values(reviewEditorThemes).forEach(({ name, base, colors }) =>
+      monaco.value?.editor.defineTheme(name, { base, inherit: true, rules: [], colors })
+    );
+    applyEditorTheme();
     editor = monaco.value.editor.createDiffEditor(editorElement.value, {
       automaticLayout: true,
       readOnly: true,
@@ -897,10 +918,12 @@ watch([() => props.comments, () => props.annotations, () => props.deletionErrors
 });
 
 onMounted(() => {
+  window.addEventListener(themeModeChangedEvent, applyEditorTheme);
   void createEditor();
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener(themeModeChangedEvent, applyEditorTheme);
   saveScrollPosition();
   editorResizeObserver?.disconnect();
   viewZoneResizeObserver?.disconnect();
@@ -965,16 +988,16 @@ onBeforeUnmount(() => {
 }
 
 .review-diff-editor :global(.review-comment-line-original) {
-  background: rgb(241 250 140 / 18%);
+  background: rgb(var(--yellow-rgb) / 18%);
 }
 
 .review-diff-editor :global(.review-comment-line-modified) {
-  background: rgb(139 233 253 / 16%);
+  background: rgb(var(--blue-rgb) / 16%);
 }
 
 .review-diff-editor :global(.review-agent-line-original),
 .review-diff-editor :global(.review-agent-line-modified) {
-  background: rgb(189 147 249 / 14%);
+  background: rgb(var(--purple-rgb) / 14%);
 }
 
 .review-diff-editor :global(.review-comment-glyph-original),
@@ -987,11 +1010,11 @@ onBeforeUnmount(() => {
 }
 
 .review-diff-editor :global(.review-comment-glyph-original) {
-  background: #f1fa8c;
+  background: var(--yellow);
 }
 
 .review-diff-editor :global(.review-comment-glyph-modified) {
-  background: #8be9fd;
+  background: var(--blue);
 }
 
 .review-diff-editor :global(.review-agent-glyph-original),
@@ -1000,7 +1023,7 @@ onBeforeUnmount(() => {
   height: 9px !important;
   margin-left: 5px;
   margin-top: 5px;
-  border: 1px solid #bd93f9;
+  border: 1px solid var(--purple);
   background: transparent;
   transform: rotate(45deg);
 }

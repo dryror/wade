@@ -431,11 +431,11 @@ definitions:
         - ctrl
         - meta
         type: string
-      themeAccentColor:
+      themeMode:
         enum:
-        - white
-        - orange
-        - purple
+        - dark
+        - light
+        - system
         type: string
       workspaceDirectories:
         items:
@@ -452,7 +452,7 @@ definitions:
     - openWorktreesInNewTabs
     - shell
     - shortcutModifier
-    - themeAccentColor
+    - themeMode
     - workspaceDirectories
     - worktreeCopyExcludes
     type: object
