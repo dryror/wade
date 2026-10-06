@@ -4,6 +4,7 @@ import {
   BookOpen,
   Bot,
   Check,
+  ChevronsDownUp,
   Code2,
   Columns2,
   EyeOff,
@@ -349,7 +350,7 @@ const flattenFileTree = (node: ReviewFileTreeNode, depth = 0): ReviewFileTreeRow
       }
 
       const row: ReviewFileTreeRow = { kind: 'dir', id: child.path, name: child.name, path: child.path, depth };
-      if (collapsedDirectories.value[child.path]) {
+      if (isDirectoryCollapsed(child.path)) {
         return [row];
       }
 
@@ -359,6 +360,18 @@ const flattenFileTree = (node: ReviewFileTreeNode, depth = 0): ReviewFileTreeRow
 const fileTreeRows = computed(() =>
   normalizedFilterText.value ? [] : flattenFileTree(buildFileTree(filteredFiles.value))
 );
+
+const scopedDirectoryPaths = computed(() => {
+  const directoryPaths = new Set<string>();
+  for (const file of scopedFiles.value) {
+    const parts = file.path.split('/').slice(0, -1);
+    parts.forEach((_, index) => directoryPaths.add(parts.slice(0, index + 1).join('/')));
+  }
+
+  return [...directoryPaths];
+});
+
+const canCollapseAllDirectories = computed(() => !normalizedFilterText.value && scopedDirectoryPaths.value.length > 0);
 
 const activeFile = computed(() => reviewData.value?.files.find((file) => file.id === activeFileId.value) ?? null);
 const activeComparison = computed(() => getComparison(activeFile.value, activeScope.value));
@@ -518,10 +531,23 @@ const toggleAgentAnnotations = () => {
   showAgentAnnotations.value = !showAgentAnnotations.value;
 };
 
+const directoryKey = (directoryPath: string) => cacheKey(activeScope.value, directoryPath);
+
+// Current files covers the whole repository, so its folders start collapsed until opened.
+const isDirectoryCollapsed = (directoryPath: string) =>
+  collapsedDirectories.value[directoryKey(directoryPath)] ?? activeScope.value === 'current';
+
 const toggleDirectoryCollapsed = (directoryPath: string) => {
   collapsedDirectories.value = {
     ...collapsedDirectories.value,
-    [directoryPath]: !collapsedDirectories.value[directoryPath]
+    [directoryKey(directoryPath)]: !isDirectoryCollapsed(directoryPath)
+  };
+};
+
+const collapseAllDirectories = () => {
+  collapsedDirectories.value = {
+    ...collapsedDirectories.value,
+    ...Object.fromEntries(scopedDirectoryPaths.value.map((directoryPath) => [directoryKey(directoryPath), true]))
   };
 };
 
@@ -1134,10 +1160,22 @@ defineExpose({
           </button>
         </section>
 
-        <label class="review-search">
-          <span>Filter files</span>
-          <input ref="searchInput" v-model="filterText" type="search" placeholder="Search files" spellcheck="false" />
-        </label>
+        <section class="review-search" aria-label="File list actions">
+          <label>
+            <span>Filter files</span>
+            <input ref="searchInput" v-model="filterText" type="search" placeholder="Search files" spellcheck="false" />
+          </label>
+          <button
+            class="review-collapse-button"
+            type="button"
+            :disabled="!canCollapseAllDirectories"
+            title="Collapse all folders"
+            aria-label="Collapse all folders"
+            @click="collapseAllDirectories"
+          >
+            <ChevronsDownUp :size="15" :stroke-width="1.8" aria-hidden="true" />
+          </button>
+        </section>
 
         <section class="review-file-list" aria-label="Files">
           <p v-if="!hasReviewableFiles" class="review-muted">No reviewable files found.</p>
@@ -1185,7 +1223,7 @@ defineExpose({
             >
               <span class="review-file-name">
                 <span v-if="row.kind === 'dir'" class="review-directory-chevron">{{
-                  collapsedDirectories[row.path] ? '›' : '⌄'
+                  isDirectoryCollapsed(row.path) ? '›' : '⌄'
                 }}</span>
                 <span>{{ row.name }}</span>
               </span>
@@ -1604,11 +1642,28 @@ button:not(:disabled):focus-visible {
 
 .review-search {
   display: grid;
-  gap: 7px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--text);
   color: var(--muted);
   font-size: 11px;
+}
+
+.review-search label {
+  display: grid;
+  gap: 7px;
+}
+
+.review-collapse-button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 0;
 }
 
 .review-search input,
