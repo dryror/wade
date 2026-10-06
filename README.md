@@ -101,6 +101,9 @@ not stopped by `wade stop`.
 
 ## Keyboard shortcuts
 
+Shortcuts use `Ctrl` by default. Set `shortcutModifier` to `meta` to use `Cmd`
+instead, which leaves `Ctrl` shortcuts to the terminal.
+
 | Shortcut | Action |
 | --- | --- |
 | `Ctrl + K` | Open the command palette |
@@ -134,6 +137,7 @@ A complete configuration looks like this:
   "openWorktreesInNewTabs": false,
   "worktreeCopyExcludes": [],
   "themeAccentColor": "white",
+  "shortcutModifier": "ctrl",
   "linear": {
     "enabled": false,
     "workspace": ""

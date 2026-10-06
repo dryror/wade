@@ -27,6 +27,7 @@ func TestParseSettingsAppliesConfiguredValues(t *testing.T) {
 		"openWorktreesInNewTabs":true,
 		"worktreeCopyExcludes":["node_modules"],
 		"themeAccentColor":"purple",
+		"shortcutModifier":"meta",
 		"linear":{"enabled":true,"workspace":" Example_Workspace "}
 	}`))
 	if err != nil {
@@ -40,7 +41,7 @@ func TestParseSettingsAppliesConfiguredValues(t *testing.T) {
 	if len(settings.Agents) != 1 || settings.Agents[0].Name != "Custom" {
 		t.Fatalf("Agents = %#v", settings.Agents)
 	}
-	if !reflect.DeepEqual(settings.WorktreeCopyExcludes, []string{"node_modules"}) || settings.ThemeAccentColor != ThemeAccentColorPurple {
+	if !reflect.DeepEqual(settings.WorktreeCopyExcludes, []string{"node_modules"}) || settings.ThemeAccentColor != ThemeAccentColorPurple || settings.ShortcutModifier != ShortcutModifierMeta {
 		t.Fatalf("settings = %#v", settings)
 	}
 	if !settings.Linear.Enabled || settings.Linear.Workspace != "Example_Workspace" {
@@ -66,5 +67,15 @@ func TestParseSettingsFallsBackForInvalidThemeAccent(t *testing.T) {
 	}
 	if persisted.settings.ThemeAccentColor != ThemeAccentColorWhite {
 		t.Fatalf("ThemeAccentColor = %q", persisted.settings.ThemeAccentColor)
+	}
+}
+
+func TestParseSettingsFallsBackForInvalidShortcutModifier(t *testing.T) {
+	persisted, err := parseSettings([]byte(`{"shortcutModifier":"alt"}`))
+	if err != nil {
+		t.Fatalf("parseSettings() error = %v", err)
+	}
+	if persisted.settings.ShortcutModifier != ShortcutModifierCtrl {
+		t.Fatalf("ShortcutModifier = %q", persisted.settings.ShortcutModifier)
 	}
 }

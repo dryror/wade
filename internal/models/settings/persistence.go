@@ -25,6 +25,7 @@ type settingsFile struct {
 	OpenWorktreesInNewTabs             *bool           `json:"openWorktreesInNewTabs"`
 	WorktreeCopyExcludes               *[]string       `json:"worktreeCopyExcludes"`
 	ThemeAccentColor                   *string         `json:"themeAccentColor"`
+	ShortcutModifier                   *string         `json:"shortcutModifier"`
 	Linear                             *LinearSettings `json:"linear"`
 }
 
@@ -37,6 +38,7 @@ func defaultSettings() Settings {
 		OpenWorktreesInNewTabs:             false,
 		WorktreeCopyExcludes:               []string{},
 		ThemeAccentColor:                   ThemeAccentColorWhite,
+		ShortcutModifier:                   ShortcutModifierCtrl,
 		Linear:                             LinearSettings{Enabled: false, Workspace: ""},
 	}
 }
@@ -79,6 +81,12 @@ func parseSettings(contents []byte) (persistedSettings, error) {
 			settings.ThemeAccentColor = themeAccentColor
 		}
 	}
+	if file.ShortcutModifier != nil {
+		shortcutModifier := normaliseShortcutModifier(*file.ShortcutModifier)
+		if validateShortcutModifier(shortcutModifier) == nil {
+			settings.ShortcutModifier = shortcutModifier
+		}
+	}
 	if file.Linear != nil {
 		settings.Linear = LinearSettings{
 			Enabled:   file.Linear.Enabled,
@@ -106,6 +114,7 @@ func encodeSettings(settings Settings, existing map[string]json.RawMessage) ([]b
 		{name: "openWorktreesInNewTabs", value: settings.OpenWorktreesInNewTabs},
 		{name: "worktreeCopyExcludes", value: settings.WorktreeCopyExcludes},
 		{name: "themeAccentColor", value: normaliseThemeAccentColor(settings.ThemeAccentColor)},
+		{name: "shortcutModifier", value: normaliseShortcutModifier(settings.ShortcutModifier)},
 		{name: "linear", value: LinearSettings{
 			Enabled:   settings.Linear.Enabled,
 			Workspace: strings.TrimSpace(settings.Linear.Workspace),

@@ -90,6 +90,9 @@ func TestNormaliseAndValidateSettingsRejectsInvalidDomainValues(t *testing.T) {
 		"invalid theme accent": func(settings *Settings) {
 			settings.ThemeAccentColor = "blue"
 		},
+		"invalid shortcut modifier": func(settings *Settings) {
+			settings.ShortcutModifier = "alt"
+		},
 	}
 	for name, mutate := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -108,6 +111,7 @@ func TestNormaliseAndValidateSettingsTrimsValuesAndDefaultsTheme(t *testing.T) {
 	request.Agents[0].Command = " pi -c "
 	request.WorktreeCopyExcludes = []string{" node_modules ", ""}
 	request.ThemeAccentColor = ""
+	request.ShortcutModifier = ""
 
 	normalised, err := normaliseAndValidateSettings(request, "/home/test", &settingsFileSystemStub{}, testEnvironment())
 	if err != nil {
@@ -121,6 +125,9 @@ func TestNormaliseAndValidateSettingsTrimsValuesAndDefaultsTheme(t *testing.T) {
 	}
 	if normalised.ThemeAccentColor != ThemeAccentColorWhite {
 		t.Fatalf("ThemeAccentColor = %q", normalised.ThemeAccentColor)
+	}
+	if normalised.ShortcutModifier != ShortcutModifierCtrl {
+		t.Fatalf("ShortcutModifier = %q", normalised.ShortcutModifier)
 	}
 }
 

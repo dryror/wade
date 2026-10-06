@@ -1,4 +1,6 @@
 import { onBeforeUnmount, onMounted } from 'vue';
+import { useSettingsStore } from '@/stores/useSettingsStore';
+import { hasShortcutModifier, isShortcut, type ShortcutModifier } from '@/utils/shortcutModifier';
 
 const workspaceShortcutPrefixTimeoutMs = 1500;
 const workspaceShortcutPrefixKey = 'b';
@@ -14,17 +16,11 @@ type WorkspaceKeyboardShortcutsOptions = {
   toggleTerminalZoom: () => void;
 };
 
-const isCtrlShortcut = (event: KeyboardEvent, key: string) =>
-  event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey && event.key.toLowerCase() === key;
-
-const isCtrlAltShortcut = (event: KeyboardEvent, key: string, code?: string) =>
-  event.ctrlKey &&
+const isModifierAltShortcut = (event: KeyboardEvent, modifier: ShortcutModifier, key: string, code?: string) =>
+  hasShortcutModifier(event, modifier) &&
   event.altKey &&
-  !event.metaKey &&
   !event.shiftKey &&
   (event.key.toLowerCase() === key || event.code === code);
-
-const isShortcutPrefix = (event: KeyboardEvent) => isCtrlShortcut(event, workspaceShortcutPrefixKey);
 
 const isNumberKey = (key: string) => /^[1-9]$/.test(key);
 
@@ -34,6 +30,7 @@ export const useWorkspaceKeyboardShortcuts = ({
   toggleScratchpadTerminal,
   toggleTerminalZoom
 }: WorkspaceKeyboardShortcutsOptions) => {
+  const settingsStore = useSettingsStore();
   let isWaitingForPrefixCommand = false;
   let prefixTimeout: number | undefined;
 
@@ -79,14 +76,16 @@ export const useWorkspaceKeyboardShortcuts = ({
   };
 
   const handleKeydown = (event: KeyboardEvent) => {
-    if (isCtrlAltShortcut(event, scratchpadTerminalKey, scratchpadTerminalCode)) {
+    const modifier = settingsStore.settings.shortcutModifier;
+
+    if (isModifierAltShortcut(event, modifier, scratchpadTerminalKey, scratchpadTerminalCode)) {
       stopEvent(event);
       clearPrefix();
       toggleScratchpadTerminal();
       return;
     }
 
-    if (isShortcutPrefix(event)) {
+    if (isShortcut(event, modifier, workspaceShortcutPrefixKey)) {
       stopEvent(event);
       startPrefix();
       return;

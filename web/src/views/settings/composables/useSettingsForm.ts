@@ -1,5 +1,6 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, readonly, ref } from 'vue';
 import { useSettingsStore } from '@/stores/useSettingsStore';
+import type { ShortcutModifier } from '@/utils/shortcutModifier';
 import { applyThemeAccentColor, type ThemeAccentColor } from '@/utils/theme';
 import {
   cloneSettings,
@@ -20,6 +21,7 @@ const settingsHaveChanged = (current: Settings, saved: Settings) =>
   current.openWorktreesInNewTabs !== saved.openWorktreesInNewTabs ||
   JSON.stringify(current.worktreeCopyExcludes) !== JSON.stringify(saved.worktreeCopyExcludes) ||
   current.themeAccentColor !== saved.themeAccentColor ||
+  current.shortcutModifier !== saved.shortcutModifier ||
   current.linear.enabled !== saved.linear.enabled ||
   current.linear.workspace !== saved.linear.workspace;
 
@@ -71,6 +73,7 @@ export const useSettingsForm = () => {
     form.openWorktreesInNewTabs = settings.openWorktreesInNewTabs;
     form.worktreeCopyExcludes = [...settings.worktreeCopyExcludes];
     form.themeAccentColor = settings.themeAccentColor;
+    form.shortcutModifier = settings.shortcutModifier;
     form.linear = { ...settings.linear };
   };
 
@@ -207,6 +210,11 @@ export const useSettingsForm = () => {
     clearMessages();
   };
 
+  const updateShortcutModifier = (shortcutModifier: ShortcutModifier) => {
+    form.shortcutModifier = shortcutModifier;
+    clearMessages();
+  };
+
   const updateWorktreeCopyExclude = (index: number, event: Event) => {
     const nextExclude = inputValue(event);
     if (nextExclude === undefined) {
@@ -294,6 +302,7 @@ export const useSettingsForm = () => {
     updateLinearEnabled,
     updateLinearWorkspace,
     updateThemeAccentColor,
+    updateShortcutModifier,
     updateWorktreeCopyExclude,
     addWorktreeCopyExclude,
     removeWorktreeCopyExclude,

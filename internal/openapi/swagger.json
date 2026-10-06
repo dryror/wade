@@ -2093,6 +2093,7 @@
                 "linear",
                 "openWorktreesInNewTabs",
                 "shell",
+                "shortcutModifier",
                 "themeAccentColor",
                 "workspaceDirectories",
                 "worktreeCopyExcludes"
@@ -2115,6 +2116,13 @@
                 },
                 "shell": {
                     "type": "string"
+                },
+                "shortcutModifier": {
+                    "type": "string",
+                    "enum": [
+                        "ctrl",
+                        "meta"
+                    ]
                 },
                 "themeAccentColor": {
                     "type": "string",

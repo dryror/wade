@@ -426,6 +426,11 @@ definitions:
         type: boolean
       shell:
         type: string
+      shortcutModifier:
+        enum:
+        - ctrl
+        - meta
+        type: string
       themeAccentColor:
         enum:
         - white
@@ -446,6 +451,7 @@ definitions:
     - linear
     - openWorktreesInNewTabs
     - shell
+    - shortcutModifier
     - themeAccentColor
     - workspaceDirectories
     - worktreeCopyExcludes

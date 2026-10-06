@@ -1,24 +1,31 @@
 import { onBeforeUnmount, onMounted } from 'vue';
+import { useSettingsStore } from '@/stores/useSettingsStore';
+import { isShortcut } from '@/utils/shortcutModifier';
 
 export const useCommandPaletteKeyboardShortcuts = ({
   openActiveWorkspacePicker,
   openCommandPalette,
   openWorkspacePicker
 }: CommandPaletteKeyboardShortcutsOptions) => {
+  const settingsStore = useSettingsStore();
+
+  const isModifierShortcut = (event: KeyboardEvent, key: string) =>
+    isShortcut(event, settingsStore.settings.shortcutModifier, key);
+
   const handleKeydown = (event: KeyboardEvent) => {
-    if (isCtrlShortcut(event, 'p')) {
+    if (isModifierShortcut(event, 'p')) {
       stopEvent(event);
       openWorkspacePicker();
       return;
     }
 
-    if (isCtrlShortcut(event, 's')) {
+    if (isModifierShortcut(event, 's')) {
       stopEvent(event);
       openActiveWorkspacePicker();
       return;
     }
 
-    if (isCtrlShortcut(event, 'k')) {
+    if (isModifierShortcut(event, 'k')) {
       stopEvent(event);
       openCommandPalette();
     }
@@ -38,9 +45,6 @@ type CommandPaletteKeyboardShortcutsOptions = {
   openCommandPalette: () => void;
   openWorkspacePicker: () => void;
 };
-
-const isCtrlShortcut = (event: KeyboardEvent, key: string) =>
-  event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey && event.key.toLowerCase() === key;
 
 const stopEvent = (event: KeyboardEvent) => {
   event.preventDefault();

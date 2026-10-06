@@ -215,6 +215,14 @@ export interface ReviewSnapshotList {
   items: ReviewSnapshot[];
 }
 
+export type SettingsShortcutModifier = typeof SettingsShortcutModifier[keyof typeof SettingsShortcutModifier];
+
+
+export const SettingsShortcutModifier = {
+  ctrl: 'ctrl',
+  meta: 'meta',
+} as const;
+
 export type SettingsThemeAccentColor = typeof SettingsThemeAccentColor[keyof typeof SettingsThemeAccentColor];
 
 
@@ -230,6 +238,7 @@ export interface Settings {
   linear: LinearSettings;
   openWorktreesInNewTabs: boolean;
   shell: string;
+  shortcutModifier: SettingsShortcutModifier;
   themeAccentColor: SettingsThemeAccentColor;
   workspaceDirectories: string[];
   worktreeCopyExcludes: string[];

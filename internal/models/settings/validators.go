@@ -41,6 +41,11 @@ func normaliseAndValidateSettings(settings Settings, homeDirectory string, files
 		return Settings{}, err
 	}
 
+	settings.ShortcutModifier = normaliseShortcutModifier(settings.ShortcutModifier)
+	if err := validateShortcutModifier(settings.ShortcutModifier); err != nil {
+		return Settings{}, err
+	}
+
 	settings.Linear.Workspace = strings.TrimSpace(settings.Linear.Workspace)
 	if err := validateLinearSettings(settings.Linear); err != nil {
 		return Settings{}, err
@@ -182,6 +187,23 @@ func normaliseThemeAccentColor(color string) string {
 		return ThemeAccentColorWhite
 	}
 	return color
+}
+
+func validateShortcutModifier(modifier string) error {
+	switch modifier {
+	case ShortcutModifierCtrl, ShortcutModifierMeta:
+		return nil
+	default:
+		return fmt.Errorf("invalid shortcut modifier %q", modifier)
+	}
+}
+
+func normaliseShortcutModifier(modifier string) string {
+	modifier = strings.TrimSpace(modifier)
+	if modifier == "" {
+		return ShortcutModifierCtrl
+	}
+	return modifier
 }
 
 func trimWorkspaceDirectories(directories []string) []string {

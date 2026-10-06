@@ -1,4 +1,5 @@
 import type { Agent, LinearSettings, Settings } from '@/api/generated/wade';
+import { defaultShortcutModifier, normaliseShortcutModifier } from '@/utils/shortcutModifier';
 import { defaultThemeAccentColor, normaliseThemeAccentColor } from '@/utils/theme';
 
 export type { Agent, LinearSettings, Settings };
@@ -16,6 +17,7 @@ export const createEmptySettings = (): Settings => ({
   openWorktreesInNewTabs: false,
   worktreeCopyExcludes: [],
   themeAccentColor: defaultThemeAccentColor,
+  shortcutModifier: defaultShortcutModifier,
   linear: {
     enabled: false,
     workspace: ''
@@ -32,6 +34,7 @@ export const cloneSettings = (settings: Settings): Settings => ({
   openWorktreesInNewTabs: settings.openWorktreesInNewTabs,
   worktreeCopyExcludes: [...settings.worktreeCopyExcludes],
   themeAccentColor: settings.themeAccentColor,
+  shortcutModifier: settings.shortcutModifier,
   linear: { ...settings.linear }
 });
 
@@ -58,6 +61,7 @@ export const normaliseSettings = (settings: Settings): Settings => ({
   openWorktreesInNewTabs: settings.openWorktreesInNewTabs,
   worktreeCopyExcludes: normaliseWorktreeCopyExcludes(settings.worktreeCopyExcludes),
   themeAccentColor: normaliseThemeAccentColor(settings.themeAccentColor),
+  shortcutModifier: normaliseShortcutModifier(settings.shortcutModifier),
   linear: {
     enabled: settings.linear.enabled,
     workspace: settings.linear.workspace.trim()

@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import Checkbox from '@/components/Checkbox.vue';
 import AgentSettingsEditor from '@/views/settings/components/AgentSettingsEditor.vue';
+import ShortcutModifierPicker from '@/views/settings/components/ShortcutModifierPicker.vue';
 import ThemeAccentPicker from '@/views/settings/components/ThemeAccentPicker.vue';
 import { useSettingsForm } from '@/views/settings/composables/useSettingsForm';
 
@@ -32,6 +33,7 @@ const {
   updateLinearEnabled,
   updateLinearWorkspace,
   updateThemeAccentColor,
+  updateShortcutModifier,
   updateWorktreeCopyExclude,
   addWorktreeCopyExclude,
   removeWorktreeCopyExclude,
@@ -58,6 +60,11 @@ const selectedThemeAccentColor = computed({
   set: updateThemeAccentColor
 });
 
+const selectedShortcutModifier = computed({
+  get: () => form.shortcutModifier,
+  set: updateShortcutModifier
+});
+
 onMounted(() => {
   document.title = 'WADE - Settings';
 });
@@ -81,6 +88,8 @@ onMounted(() => {
     <section id="settings-content" aria-label="Settings form">
       <form id="settings-form" @submit.prevent="submit">
         <ThemeAccentPicker v-model:theme-accent-color="selectedThemeAccentColor" />
+
+        <ShortcutModifierPicker v-model:shortcut-modifier="selectedShortcutModifier" />
 
         <section id="workspace-directories-section" aria-labelledby="workspace-directories-title">
           <header class="settings-section-header">

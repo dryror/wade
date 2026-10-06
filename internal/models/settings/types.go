@@ -7,6 +7,12 @@ const (
 	ThemeAccentColorPurple = "purple"
 )
 
+// Supported keyboard shortcut modifier values.
+const (
+	ShortcutModifierCtrl = "ctrl"
+	ShortcutModifierMeta = "meta"
+)
+
 // Agent configures one available agent terminal.
 type Agent struct {
 	Name    string `json:"name"`
@@ -29,6 +35,7 @@ type Settings struct {
 	OpenWorktreesInNewTabs             bool           `json:"openWorktreesInNewTabs"`
 	WorktreeCopyExcludes               []string       `json:"worktreeCopyExcludes"`
 	ThemeAccentColor                   string         `json:"themeAccentColor" enums:"white,orange,purple"`
+	ShortcutModifier                   string         `json:"shortcutModifier" enums:"ctrl,meta"`
 	Linear                             LinearSettings `json:"linear"`
 } // @name Settings
 

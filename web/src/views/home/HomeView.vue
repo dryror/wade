@@ -3,9 +3,12 @@ import { onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useRecentWorkspaces } from '@/features/workspaces/composables/useRecentWorkspaces';
 import { useWorkspaces } from '@/features/workspaces/composables/useWorkspaces';
+import { useSettingsStore } from '@/stores/useSettingsStore';
+import { shortcutModifierLabel } from '@/utils/shortcutModifier';
 
 const { syncWorkspaces } = useWorkspaces();
 const { recentWorkspaceIds, removeUnavailableRecentWorkspaces } = useRecentWorkspaces();
+const settingsStore = useSettingsStore();
 
 const syncRecentWorkspaces = async () => {
   const availableWorkspaces = await syncWorkspaces();
@@ -36,7 +39,9 @@ onMounted(() => {
         </li>
       </ul>
     </nav>
-    <p v-else id="empty-workspaces">Press Ctrl + P to get started</p>
+    <p v-else id="empty-workspaces">
+      Press {{ shortcutModifierLabel(settingsStore.settings.shortcutModifier) }} + P to get started
+    </p>
   </section>
 </template>
 
