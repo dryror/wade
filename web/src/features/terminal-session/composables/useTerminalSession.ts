@@ -30,6 +30,7 @@ const encoder = new TextEncoder();
 const replayStartMessageType = 'replayStart';
 const replayEndMessageType = 'replayEnd';
 const activateMessageType = 'activate';
+const shiftEnterSequence = '\x1b\r';
 const embeddedFontFamily = 'WebTerminalJetBrainsMonoNerdFont';
 const nerdFontStack = [
   embeddedFontFamily,
@@ -326,6 +327,19 @@ export const useTerminalSession = ({
     sendEscapeKey();
   };
 
+  const handleShiftEnterKey = (event: KeyboardEvent) => {
+    if (event.key !== 'Enter' || !event.shiftKey) {
+      return true;
+    }
+
+    if (event.type === 'keydown') {
+      event.preventDefault();
+      sendTerminalInput(shiftEnterSequence);
+    }
+
+    return false;
+  };
+
   const connectWebSocket = (run: number) => {
     const connection = createTerminalWebSocket(socketUrl);
     socket = connection;
@@ -437,6 +451,7 @@ export const useTerminalSession = ({
     terminal.loadAddon(new WebLinksAddon(openHttpLink));
     terminal.open(terminalElement.value);
     loadWebglAddon(terminal);
+    terminal.attachCustomKeyEventHandler(handleShiftEnterKey);
 
     terminalDataDisposable = terminal.onData(sendTerminalInput);
     terminalResizeDisposable = terminal.onResize(sendResize);
