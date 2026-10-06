@@ -229,7 +229,7 @@ defineExpose({
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-columns: 80ch minmax(0, 1fr);
+  grid-template-columns: minmax(80ch, 2fr) minmax(0, 3fr);
   grid-template-areas: 'agent misc';
   overflow: hidden;
 }
